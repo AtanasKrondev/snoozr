@@ -1,9 +1,9 @@
 import React from 'react';
+import { Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import TaskList from './TaskList'
 import Container from '@material-ui/core/Container';
-import lists from '../data'
-
+import BoardCard from './Board/BoardCard'
+import BoardCardForm from './Board/BoardCardForm'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -11,7 +11,7 @@ const useStyles = makeStyles((theme) => ({
         paddingTop: theme.spacing(1),
         display: 'flex',
         flexDirection: 'row',
-        overflowX: 'scroll',
+        overflowY: 'scroll',
         height: '90vh',
         '&::-webkit-scrollbar': {
             width: '0.4em'
@@ -27,14 +27,23 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function Board() {
+export default function Home() {
     const classes = useStyles();
 
     return (
         <Container className={classes.root}>
-            {lists.map((list) => (
-                <TaskList key={list.id} list={list}></TaskList>
-            ))}
+            <Grid container>
+                <BoardCard />
+                <BoardCard />
+                <BoardCard />
+                <BoardCard />
+                <BoardCard />
+                <BoardCard />
+                <BoardCard />
+                <BoardCard />
+                <BoardCard />
+                <BoardCardForm />
+            </Grid>
         </Container>
     )
 }

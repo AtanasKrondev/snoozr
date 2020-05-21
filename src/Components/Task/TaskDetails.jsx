@@ -10,8 +10,9 @@ import EditIcon from '@material-ui/icons/Edit';
 import AddIcon from '@material-ui/icons/Add';
 import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
-import CommentCard from './CommentCard';
+import CommentCard from '../Comment/CommentCard';
 import TaskImage from './TaskImage'
+import CommentForm from '../Comment/CommentForm'
 
 const useStyles = makeStyles(theme => ({
     cover: {
@@ -60,7 +61,7 @@ export default function TaskDetails({ isOpen, handleClose, task }) {
         <>
             <Dialog open={isOpen} onClose={handleClose} maxWidth="md" fullWidth scroll="body" fullScreen={fullScreen}>
                 <div className={classes.cover}>
-                    {task.image && <img src={task.image} className={classes.img} alt="task" />}
+                    {task.image && <img src={task.image} className={classes.img} alt="task" onClick={handleOpenImg} />}
                     <IconButton className={classes.topRight} onClick={handleClose}><CloseIcon /></IconButton>
                     <IconButton className={classes.bottomRight} onClick={handleOpenImg} ><ImageIcon /></IconButton>
                     <Typography className={classes.bottomLeft} variant="subtitle2">in list: To DO</Typography>
@@ -104,6 +105,7 @@ export default function TaskDetails({ isOpen, handleClose, task }) {
                         </Grid>
                         <Grid item xs={12}>
                             <Typography variant="body1" component="h3">Comments</Typography>
+                            <CommentForm />
                             {task.comments && task.comments.length > 0 &&
                                 task.comments.map(comment => <CommentCard key={comment.id} comment={comment} />)}
                         </Grid>

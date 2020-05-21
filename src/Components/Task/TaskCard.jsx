@@ -6,7 +6,6 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
-// import { IconButton } from '@material-ui/core';
 import SubjectIcon from '@material-ui/icons/Subject';
 import CommentIcon from '@material-ui/icons/Comment';
 import ScheduleIcon from '@material-ui/icons/Schedule';
@@ -16,6 +15,7 @@ import TaskDetails from './TaskDetails'
 
 const useStyles = makeStyles(theme => ({
     root: {
+        background: theme.palette.background.default,
         maxWidth: 345,
         marginTop: theme.spacing(1),
         marginLeft: theme.spacing(1),
@@ -40,7 +40,7 @@ export default function TaskCard({ task }) {
 
     return (
         <>
-            <Card className={classes.root}>
+            <Card raised className={classes.root}>
                 <CardActionArea onClick={handleOpen}>
                     {task.image && <CardMedia
                         className={classes.media}

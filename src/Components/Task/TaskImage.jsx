@@ -1,10 +1,9 @@
 import React from 'react';
 import Dialog from '@material-ui/core/Dialog';
-import { IconButton } from '@material-ui/core';
+import { IconButton, FormControl, InputLabel, InputAdornment, OutlinedInput } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
-import ImageIcon from '@material-ui/icons/Image';
-import Typography from '@material-ui/core/Typography';
+import PublishIcon from '@material-ui/icons/Publish';
 import CloseIcon from '@material-ui/icons/Close';
 
 const useStyles = makeStyles(theme => ({
@@ -33,6 +32,9 @@ const useStyles = makeStyles(theme => ({
         width: '100%',
         height: 'auto',
     },
+    form: {
+        background: theme.palette.background.default,
+    }
 }));
 
 
@@ -46,9 +48,15 @@ export default function TaskDetails({ isOpenImg, handleCloseImg, image }) {
             <div className={classes.cover}>
                 {image && <img src={image} className={classes.img} alt="task" />}
                 <IconButton className={classes.topRight} onClick={handleCloseImg}><CloseIcon /></IconButton>
-                <IconButton className={classes.bottomRight} ><ImageIcon /></IconButton>
-                <Typography className={classes.bottomLeft} variant="subtitle2">in list: To DO</Typography>
             </div>
+            <FormControl fullWidth className={classes.form}>
+                <InputLabel htmlFor="uploadImage" variant="filled">Upload Image</InputLabel>
+                <OutlinedInput id="uploadImage" type="text" fullWidth endAdornment={
+                    <InputAdornment position="end">
+                        <IconButton><PublishIcon /></IconButton>
+                    </InputAdornment>
+                } />
+            </FormControl>
         </Dialog >
     )
 }

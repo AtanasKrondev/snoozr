@@ -2,7 +2,10 @@ import React from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { makeStyles } from '@material-ui/core/styles';
 import Header from './Components/Header'
-import Board from './Components/Board'
+import Board from './Components/Board/Board'
+// import Home from './Components/Home'
+// import SignIn from './Components/Auth/SignIn'
+// import SignUp from './Components/Auth/SignUp'
 import { ThemeProvider } from '@material-ui/core/styles';
 import { Paper } from '@material-ui/core';
 import theme from './theme'
@@ -25,6 +28,8 @@ function App() {
           <Header />
           {/* <Home /> */}
           <Board />
+          {/* <SignIn /> */}
+          {/* <SignUp /> */}
         </Paper>
       </ThemeProvider>
     </div>
