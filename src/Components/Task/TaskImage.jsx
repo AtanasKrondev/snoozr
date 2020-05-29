@@ -8,7 +8,8 @@ import CloseIcon from '@material-ui/icons/Close';
 
 const useStyles = makeStyles(theme => ({
     cover: {
-        position: 'relative'
+        position: 'relative',
+        minHeight: 50,
     },
     topRight: {
         position: 'absolute',
@@ -44,7 +45,7 @@ export default function TaskDetails({ isOpenImg, handleCloseImg, image }) {
     const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
 
     return (
-        <Dialog open={isOpenImg} onClose={handleCloseImg} maxWidth="md" fullWidth scroll="body" fullScreen={fullScreen}>
+        <Dialog open={isOpenImg} onClose={handleCloseImg} maxWidth="md" scroll="body" fullScreen={fullScreen}>
             <div className={classes.cover}>
                 {image && <img src={image} className={classes.img} alt="task" />}
                 <IconButton className={classes.topRight} onClick={handleCloseImg}><CloseIcon /></IconButton>

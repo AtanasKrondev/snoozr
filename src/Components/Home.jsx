@@ -4,6 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import BoardCard from './Board/BoardCard'
 import BoardCardForm from './Board/BoardCardForm'
+import { boards } from '../data'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -33,16 +34,13 @@ export default function Home() {
     return (
         <Container className={classes.root}>
             <Grid container>
-                <BoardCard />
-                <BoardCard />
-                <BoardCard />
-                <BoardCard />
-                <BoardCard />
-                <BoardCard />
-                <BoardCard />
-                <BoardCard />
-                <BoardCard />
-                <BoardCardForm />
+                {boards.map((board, index) => (
+                    <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
+                        <BoardCard boardName={board} card />
+                    </Grid>))}
+                <Grid item xs={12} sm={6} md={4} lg={3}>
+                    <BoardCardForm card />
+                </Grid>
             </Grid>
         </Container>
     )

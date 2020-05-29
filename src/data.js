@@ -133,3 +133,5 @@ const lists = [
 ]
 
 export default lists;
+
+export const boards = ['First board', 'Second board', 'Third board', 'Fourth board', 'Fifth board', 'First board', 'Second board', 'Third board', 'Fourth board', 'Fifth board']
