@@ -12,6 +12,7 @@ import SignUp from './Components/Auth/SignUp'
 import { ThemeProvider } from '@material-ui/core/styles';
 import { Paper } from '@material-ui/core';
 import theme from './theme'
+// import Contact from './Components/Auth/Contact';
 
 const useStyles = makeStyles({
   root: {

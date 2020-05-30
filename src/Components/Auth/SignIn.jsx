@@ -1,5 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
@@ -15,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     alignItems: 'center',
     overflowY: 'scroll',
-    height: '90vh',
+    height: '86vh',
     '&::-webkit-scrollbar': {
       width: '0.4em'
     },
@@ -55,42 +57,61 @@ export default function SignIn() {
       <Typography component="h1" variant="h5">
         Sign In
         </Typography>
-      <form className={classes.form} noValidate>
-        <TextField
-          variant="outlined"
-          margin="normal"
-          required
-          fullWidth
-          id="email"
-          label="Email Address"
-          name="email"
-          autoComplete="email"
-          autoFocus
-        />
-        <TextField
-          variant="outlined"
-          margin="normal"
-          required
-          fullWidth
-          name="password"
-          label="Password"
-          type="password"
-          id="password"
-          autoComplete="current-password"
-        />
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          color="primary"
-          className={classes.submit}
-        >
-          Sign In
+      <Formik
+        initialValues={{ email: '', password: '' }}
+        onSubmit={(values) => {
+          console.log(values);
+        }}
+        validationSchema={Yup.object().shape({
+          email: Yup.string()
+            .required('E-mail is required')
+            .email('Invalid E-mail format'),
+          password: Yup.string()
+            .required('Password is required')
+            .min(6, 'Password must be at least 6 symbols')
+        })}
+      >{({ touched, errors, getFieldProps, handleSubmit }) => (
+        <form className={classes.form} onSubmit={handleSubmit}>
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="E-mail"
+            autoComplete="email"
+            error={touched.email && !!errors.email}
+            helperText={(touched.email && errors.email) && errors.email}
+            {...getFieldProps('email')}
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="password"
+            label="Password"
+            type="password"
+            autoComplete="current-password"
+            error={!!touched.password && !!errors.password}
+            helperText={(touched.password && errors.password) && errors.password}
+            {...getFieldProps('password')}
+          />
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            className={classes.submit}
+          >
+            Sign In
           </Button>
-        <Link to="/signup" className={classes.link} >
-          {"Don't have an account? Sign Up"}
-        </Link>
-      </form>
+        </form>
+      )}
+      </Formik>
+      <Link to="/signup" className={classes.link} >
+        {"Don't have an account? Sign Up"}
+      </Link>
     </Container >
   );
 }

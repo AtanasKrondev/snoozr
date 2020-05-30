@@ -1,5 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
@@ -15,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     alignItems: 'center',
     overflowY: 'scroll',
-    height: '90vh',
+    height: '86vh',
     '&::-webkit-scrollbar': {
       width: '0.4em'
     },
@@ -55,73 +57,105 @@ export default function SignUp() {
       <Typography component="h1" variant="h5">
         Sign Up
         </Typography>
-      <form className={classes.form} noValidate>
-        <TextField
-          autoComplete="name"
-          name="name"
-          variant="outlined"
-          margin="normal"
-          required
-          fullWidth
-          id="name"
-          label="Full Name"
-          autoFocus
-        />
-        <TextField
-          variant="outlined"
-          margin="normal"
-          required
-          fullWidth
-          id="photo"
-          label="Photo URL"
-          name="photo"
-          autoComplete="photo"
-        />
-        <TextField
-          variant="outlined"
-          margin="normal"
-          required
-          fullWidth
-          id="email"
-          label="Email Address"
-          name="email"
-          autoComplete="email"
-        />
-        <TextField
-          variant="outlined"
-          margin="normal"
-          required
-          fullWidth
-          name="password"
-          label="Password"
-          type="password"
-          id="password"
-        // autoComplete="current-password"
-        />
-        <TextField
-          variant="outlined"
-          margin="normal"
-          required
-          fullWidth
-          name="rePassword"
-          label="Repeat Password"
-          type="password"
-          id="rePassword"
-        // autoComplete="current-password"
-        />
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          color="primary"
-          className={classes.submit}
-        >
-          Sign Up
+      <Formik
+        initialValues={{ displayName: '', photoURL: '', email: '', password: '', rePassword: '' }}
+        onSubmit={(values) => {
+          console.log(values);
+        }}
+        validationSchema={Yup.object().shape({
+          displayName: Yup.string()
+            .required('Name is required')
+            .min(3, 'Name must be at least 3 symbols'),
+          photoURL: Yup.string()
+            .matches('/^https?://.*.(?:png|jpg|jpeg|gif)$/', 'Invalid image URL format'),
+          email: Yup.string()
+            .required('E-mail is required')
+            .email('Invalid E-mail format'),
+          password: Yup.string()
+            .required('Password is required')
+            .min(6, 'Password must be at least 6 symbols'),
+          rePassword: Yup.string()
+            .oneOf([Yup.ref('password')], 'Passwords do not match')
+        })}
+      >{({ touched, errors, getFieldProps, handleSubmit }) => (
+        <form className={classes.form} onSubmit={handleSubmit}>
+          <TextField
+            autoComplete="name"
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            autoFocus
+            id="displayName"
+            label="Full Name"
+            error={touched.displayName && !!errors.displayName}
+            helperText={(touched.displayName && errors.displayName) && errors.displayName}
+            {...getFieldProps('displayName')}
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            fullWidth
+            autoComplete="photo"
+            id="photoURL"
+            label="Photo URL"
+            error={touched.photoURL && !!errors.photoURL}
+            helperText={(touched.photoURL && errors.photoURL) && errors.photoURL}
+            {...getFieldProps('photoURL')}
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="E-mail"
+            autoComplete="email"
+            error={touched.email && !!errors.email}
+            helperText={(touched.email && errors.email) && errors.email}
+            {...getFieldProps('email')}
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="password"
+            label="Password"
+            type="password"
+            autoComplete="current-password"
+            error={!!touched.password && !!errors.password}
+            helperText={(touched.password && errors.password) && errors.password}
+            {...getFieldProps('password')}
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="rePassword"
+            label="Confirm Password"
+            type="password"
+            autoComplete="current-password"
+            error={!!touched.rePassword && !!errors.rePassword}
+            helperText={(touched.rePassword && errors.rePassword) && errors.rePassword}
+            {...getFieldProps('rePassword')}
+          />
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            className={classes.submit}
+          >
+            Sign Up
           </Button>
-        <Link to="/signin" className={classes.link}>
-          Already have an account? Sign In
+          <Link to="/signin" className={classes.link}>
+            Already have an account? Sign In
               </Link>
-      </form>
-    </Container>
+        </form>
+      )}
+      </Formik>
+    </Container >
   );
 }
