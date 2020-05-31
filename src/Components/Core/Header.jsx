@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import SnoozeIcon from '@material-ui/icons/Snooze';
 import AppBar from '@material-ui/core/AppBar';
@@ -7,40 +7,59 @@ import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-// import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 
+import { UserContext } from '../../providers/UserProvider'
+import { Avatar } from '@material-ui/core';
+
+import UserMenu from './UserMenu'
+
 export default function Header({ onClick }) {
+  const { user, loading } = useContext(UserContext);
+  const [anchorEl, setAnchorEl] = useState(null)
+  const handleMenuOpen = (event) => { setAnchorEl(event.currentTarget) }
+  const handleMenuClose = () => setAnchorEl(null);
+
   return (
-    <AppBar position="sticky">
-      <Toolbar>
-        <IconButton edge="start" color="inherit" onClick={onClick}>
-          <MenuIcon />
-        </IconButton>
-        <Box flexGrow={1}>
-        </Box>
-        <Button
-          color="inherit"
-          startIcon={<SnoozeIcon />}
-          component={Link}
-          to="/"
-        >
-          Snoozr
+    <>
+      <AppBar position="sticky">
+        <Toolbar>
+          <IconButton edge="start" color="inherit" onClick={onClick}>
+            <MenuIcon />
+          </IconButton>
+          <Box flexGrow={1}>
+          </Box>
+          <Button
+            color="inherit"
+            startIcon={<SnoozeIcon />}
+            component={Link}
+            to="/"
+          >
+            Snoozr
       </Button>
-        <Box flexGrow={1}>
-        </Box>
-        {/* <IconButton color="inherit">
-          <AccountCircleIcon />
-        </IconButton> */}
-        <Button
-          color="inherit"
-          startIcon={<ExitToAppIcon />}
-          component={Link}
-          to="/signin"
-        >
-          Sign In
+          <Box flexGrow={1}>
+          </Box>
+          {loading ? <CircularProgress color="secondary" /> :
+            user ? <IconButton color="inherit" onClick={handleMenuOpen}>
+              {
+                user.photoURL ?
+                  <Avatar alt={user.displayName} src={user.photoURL} />
+                  : <Avatar>{user.displayName && user.displayName[0]}</Avatar>
+              }
+            </IconButton> :
+              <Button
+                color="inherit"
+                startIcon={<ExitToAppIcon />}
+                component={Link}
+                to="/signin"
+              >
+                Sign In
       </Button>
-      </Toolbar>
-    </AppBar>
+          }
+        </Toolbar>
+      </AppBar>
+      <UserMenu anchorEl={anchorEl} handleMenuClose={handleMenuClose} />
+    </>
   );
 }

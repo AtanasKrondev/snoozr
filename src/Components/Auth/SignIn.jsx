@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import Avatar from '@material-ui/core/Avatar';
@@ -9,6 +9,8 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import { auth } from '../../firebase';
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -48,6 +50,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SignIn() {
   const classes = useStyles();
+  const history = useHistory();
 
   return (
     <Container maxWidth="xs" className={classes.root}>
@@ -59,8 +62,10 @@ export default function SignIn() {
         </Typography>
       <Formik
         initialValues={{ email: '', password: '' }}
-        onSubmit={(values) => {
-          console.log(values);
+        onSubmit={({ email, password }) => {
+          auth.signInWithEmailAndPassword(email, password)
+            .then(() => history.push('/'))
+            .catch(error => console.error(error))
         }}
         validationSchema={Yup.object().shape({
           email: Yup.string()

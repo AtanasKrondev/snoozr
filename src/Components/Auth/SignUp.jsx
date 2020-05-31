@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
+import { useHistory } from 'react-router-dom'
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
@@ -9,6 +10,8 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+
+import { auth } from '../../firebase'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -48,6 +51,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SignUp() {
   const classes = useStyles();
+  const history = useHistory();
 
   return (
     <Container maxWidth="xs" className={classes.root}>
@@ -59,15 +63,18 @@ export default function SignUp() {
         </Typography>
       <Formik
         initialValues={{ displayName: '', photoURL: '', email: '', password: '', rePassword: '' }}
-        onSubmit={(values) => {
-          console.log(values);
+        onSubmit={({ displayName, photoURL, email, password }) => {
+          auth.createUserWithEmailAndPassword(email, password)
+            .then(() => auth.currentUser.updateProfile({ displayName, photoURL }))
+            .then(() => history.push('/profile'))
+            .catch(error => console.error(error))
         }}
         validationSchema={Yup.object().shape({
           displayName: Yup.string()
             .required('Name is required')
             .min(3, 'Name must be at least 3 symbols'),
           photoURL: Yup.string()
-            .matches('/^https?://.*.(?:png|jpg|jpeg|gif)$/', 'Invalid image URL format'),
+            .matches('^https?://.*.(jpe?g|png|gif)$', 'Invalid image URL format'),
           email: Yup.string()
             .required('E-mail is required')
             .email('Invalid E-mail format'),

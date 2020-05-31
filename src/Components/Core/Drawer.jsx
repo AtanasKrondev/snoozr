@@ -1,9 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { SwipeableDrawer, makeStyles, List, ListItem, Divider, ListItemIcon, ListItemText } from '@material-ui/core';
-import AccountCircleIcon from '@material-ui/icons/AccountCircle';
-import SettingsIcon from '@material-ui/icons/Settings';
-import CloseIcon from '@material-ui/icons/Close';
 import HomeIcon from '@material-ui/icons/Home';
 
 import { boards } from '../../data'
@@ -25,18 +22,6 @@ export default function Drawer({ open, onClose, onOpen }) {
                 <ListItem button component={Link} to="/">
                     <ListItemIcon><HomeIcon /></ListItemIcon>
                     <ListItemText primary="Home" />
-                </ListItem>
-                <ListItem button>
-                    <ListItemIcon><AccountCircleIcon /></ListItemIcon>
-                    <ListItemText primary="Profile" />
-                </ListItem>
-                <ListItem button>
-                    <ListItemIcon><SettingsIcon /></ListItemIcon>
-                    <ListItemText primary="Settings" />
-                </ListItem>
-                <ListItem button>
-                    <ListItemIcon><CloseIcon /></ListItemIcon>
-                    <ListItemText primary="Sign Out" />
                 </ListItem>
             </List>
             <Divider />
