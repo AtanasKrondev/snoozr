@@ -11,7 +11,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 
-import { auth } from '../../firebase'
+import { auth, db } from '../../firebase'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -65,6 +65,7 @@ export default function SignUp() {
         initialValues={{ displayName: '', photoURL: '', email: '', password: '', rePassword: '' }}
         onSubmit={({ displayName, photoURL, email, password }) => {
           auth.createUserWithEmailAndPassword(email, password)
+            .then(({ user }) => db.collection('users').doc(user.uid).set({ displayName, photoURL }))
             .then(() => auth.currentUser.updateProfile({ displayName, photoURL }))
             .then(() => history.push('/profile'))
             .catch(error => console.error(error))

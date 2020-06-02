@@ -7,8 +7,8 @@ export default function UserProvider({ children }) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     useEffect(() => {
-        setLoading(true)
         auth.onAuthStateChanged(user => {
+            setLoading(true)
             setUser(user)
             setLoading(false)
         })
