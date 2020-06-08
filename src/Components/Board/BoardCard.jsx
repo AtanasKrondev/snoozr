@@ -6,7 +6,7 @@ const useStyles = makeStyles(theme => ({
     card: {
         background: theme.palette.primary.main,
         margin: theme.spacing(3),
-        height: 160,
+        height: 160
     },
     listItem: {
         background: theme.palette.primary.main,
@@ -18,17 +18,15 @@ const useStyles = makeStyles(theme => ({
     },
 }))
 
-export default function BoardCard({ boardName, card }) {
+export default function BoardCard({ boardTitle, boardId, card }) {
     const classes = useStyles();
 
     return (
         <Card raised className={card ? classes.card : classes.listItem}>
-            <CardActionArea className={classes.action} component={Link} to="/board" >
-                {/* <Link to="/board" className={classes.link}> */}
+            <CardActionArea className={classes.action} component={Link} to={`/board/${boardId}`} >
                 <Typography gutterBottom variant="h5" align="center" >
-                    {boardName}
+                    {boardTitle}
                 </Typography>
-                {/* </Link> */}
             </CardActionArea>
         </Card>
 

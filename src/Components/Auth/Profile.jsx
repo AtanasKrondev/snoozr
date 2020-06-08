@@ -7,7 +7,7 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import { auth, db } from '../../firebase';
+import { auth, usersRef } from '../../firebase';
 import { UserContext } from '../../providers/UserProvider';
 import SaveIcon from '@material-ui/icons/Save';
 import UndoIcon from '@material-ui/icons/Undo';
@@ -75,7 +75,7 @@ export default function SignIn() {
                         initialValues={{ displayName: user.displayName || '', photoURL: user.photoURL || '' }}
                         onSubmit={({ displayName, photoURL }) => {
                             auth.currentUser.updateProfile({ displayName, photoURL })
-                                .then(() => db.collection('users').doc(user.uid).set({ displayName, photoURL }, { merge: true }))
+                                .then(() => usersRef.doc(user.uid).set({ displayName, photoURL }, { merge: true }))
                                 .catch(error => console.error(error))
                         }}
                         validationSchema={Yup.object().shape({

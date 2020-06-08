@@ -10,15 +10,18 @@ import UserProvider from './providers/UserProvider'
 import Header from './Components/Core/Header'
 import Drawer from './Components/Core/Drawer'
 import AppRouter from './Components/Core/AppRouter';
+import BoardsProvider from './providers/BoardsProvider';
 
 const useStyles = makeStyles({
-  root: {
-    height: '100vh',
+  '@global': {
+    body: {
+      backgroundColor: theme.palette.background.paper
+    }
   },
 });
 
 function App() {
-  const classes = useStyles();
+  useStyles();
   const [isOpen, setOpen] = useState(false)
   const toggleDrawer = () => {
     setOpen(!isOpen);
@@ -26,16 +29,18 @@ function App() {
 
   return (
     <UserProvider>
-      <Router>
-        <CssBaseline />
-        <ThemeProvider theme={theme}>
-          <Paper className={classes.root} square>
-            <Header onClick={toggleDrawer} />
-            <Drawer open={isOpen} onClose={toggleDrawer} onOpen={toggleDrawer} />
-            <AppRouter />
-          </Paper>
-        </ThemeProvider>
-      </Router>
+      <BoardsProvider>
+        <Router>
+          <CssBaseline />
+          <ThemeProvider theme={theme}>
+            <Paper>
+              <Header onClick={toggleDrawer} />
+              <Drawer open={isOpen} onClose={toggleDrawer} onOpen={toggleDrawer} />
+              <AppRouter />
+            </Paper>
+          </ThemeProvider>
+        </Router>
+      </BoardsProvider>
     </UserProvider>
   );
 }

@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     alignItems: 'center',
     overflowY: 'scroll',
-    height: '86vh',
+    height: '90vh',
     '&::-webkit-scrollbar': {
       width: '0.4em'
     },

@@ -11,7 +11,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 
-import { auth, db } from '../../firebase'
+import { auth, usersRef } from '../../firebase'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     alignItems: 'center',
     overflowY: 'scroll',
-    height: '86vh',
+    height: '90vh',
     '&::-webkit-scrollbar': {
       width: '0.4em'
     },
@@ -65,7 +65,7 @@ export default function SignUp() {
         initialValues={{ displayName: '', photoURL: '', email: '', password: '', rePassword: '' }}
         onSubmit={({ displayName, photoURL, email, password }) => {
           auth.createUserWithEmailAndPassword(email, password)
-            .then(({ user }) => db.collection('users').doc(user.uid).set({ displayName, photoURL }))
+            .then(({ user }) => usersRef.doc(user.uid).set({ displayName, photoURL }))
             .then(() => auth.currentUser.updateProfile({ displayName, photoURL }))
             .then(() => history.push('/profile'))
             .catch(error => console.error(error))

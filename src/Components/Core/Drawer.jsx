@@ -1,11 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { SwipeableDrawer, makeStyles, List, ListItem, Divider, ListItemIcon, ListItemText } from '@material-ui/core';
+import { SwipeableDrawer, makeStyles, List, ListItem, Divider, ListItemIcon, ListItemText, LinearProgress } from '@material-ui/core';
 import HomeIcon from '@material-ui/icons/Home';
-
-import { boards } from '../../data'
 import BoardCardForm from '../Board/BoardCardForm';
 import BoardCard from '../Board/BoardCard';
+import { BoardsContext } from '../../providers/BoardsProvider';
 
 const useStyles = makeStyles((theme) => ({
     list: {
@@ -15,6 +14,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Drawer({ open, onClose, onOpen }) {
     const classes = useStyles();
+    const { boards, loading } = useContext(BoardsContext)
 
     return (
         <SwipeableDrawer open={open} onClose={onClose} onOpen={onOpen}>
@@ -25,16 +25,18 @@ export default function Drawer({ open, onClose, onOpen }) {
                 </ListItem>
             </List>
             <Divider />
-            <List className={classes.list}>
-                {boards.map((board, index) => (
-                    <ListItem key={index}>
-                        <BoardCard boardName={board} />
+            {loading ? <LinearProgress color="secondary" /> :
+                <List className={classes.list}>
+                    {boards.map((board, index) => (
+                        <ListItem key={index}>
+                            <BoardCard boardTitle={board.title} boardId={board.id} />
+                        </ListItem>
+                    ))}
+                    <ListItem>
+                        <BoardCardForm />
                     </ListItem>
-                ))}
-                <ListItem>
-                    <BoardCardForm />
-                </ListItem>
-            </List>
+                </List>
+            }
         </SwipeableDrawer>
     )
 }

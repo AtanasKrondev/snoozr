@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Dialog from '@material-ui/core/Dialog';
-import { DialogTitle, DialogContent, IconButton, FormControl, FormLabel, FormGroup, FormControlLabel } from '@material-ui/core';
+import { DialogTitle, DialogContent, IconButton, FormControl, FormLabel, FormGroup, FormControlLabel, CircularProgress } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import ImageIcon from '@material-ui/icons/Image';
@@ -13,6 +13,7 @@ import Grid from '@material-ui/core/Grid';
 import CommentCard from '../Comment/CommentCard';
 import TaskImage from './TaskImage'
 import CommentForm from '../Comment/CommentForm'
+import { tasksRef } from '../../firebase';
 
 const useStyles = makeStyles(theme => ({
     cover: {
@@ -47,72 +48,81 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
-export default function TaskDetails({ isOpen, handleClose, task }) {
+export default function TaskDetails({ isOpen, handleClose, id }) {
     const classes = useStyles();
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
-
     const [isOpenImg, setIsOpenImg] = useState(false);
-
     const handleOpenImg = () => setIsOpenImg(true);
     const handleCloseImg = () => setIsOpenImg(false);
 
+    const [task, setTask] = useState(null);
+    const [loading, setLoading] = useState(true)
+    useEffect(() => tasksRef.doc(id).onSnapshot(snapshot => {
+        setLoading(true)
+        const data = snapshot.data();
+        setTask({ id, ...data });
+        setLoading(false);
+    }), [id])
+
     return (
         <>
-            <Dialog open={isOpen} onClose={handleClose} maxWidth="md" fullWidth scroll="body" fullScreen={fullScreen}>
-                <div className={classes.cover}>
-                    {task.image && <img src={task.image} className={classes.img} alt="task" onClick={handleOpenImg} />}
-                    <IconButton className={classes.topRight} onClick={handleClose}><CloseIcon /></IconButton>
-                    <IconButton className={classes.bottomRight} onClick={handleOpenImg} ><ImageIcon /></IconButton>
-                    <Typography className={classes.bottomLeft} variant="subtitle2">in list: To DO</Typography>
-                </div>
-                <DialogTitle>{task.title}
-                </DialogTitle>
-                <DialogContent>
-                    <Grid container spacing={1}>
-                        <Grid item xs={12}>
-                            <Typography variant="body1" component="h3">Due Date
+            {loading ? <CircularProgress color="secondary" /> : <>
+                <Dialog open={isOpen} onClose={handleClose} maxWidth="md" fullWidth scroll="body" fullScreen={fullScreen}>
+                    <div className={classes.cover}>
+                        {task.image && <img src={task.image} className={classes.img} alt="task" onClick={handleOpenImg} />}
+                        <IconButton className={classes.topRight} onClick={handleClose}><CloseIcon /></IconButton>
+                        <IconButton className={classes.bottomRight} onClick={handleOpenImg} ><ImageIcon /></IconButton>
+                        <Typography className={classes.bottomLeft} variant="subtitle2">in list: To DO</Typography>
+                    </div>
+                    <DialogTitle>{task.title}
+                    </DialogTitle>
+                    <DialogContent>
+                        <Grid container spacing={1}>
+                            <Grid item xs={12}>
+                                <Typography variant="body1" component="h3">Due Date
                             {task.dueDate ?
-                                    <IconButton size="small"><EditIcon /></IconButton> :
-                                    <IconButton size="small"><AddIcon /></IconButton>
-                                }
-                            </Typography>
-                            <Typography variant="body2" component="p">{task.dueDate && task.dueDate.toString()}</Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={9}>
-                            <Typography variant="body1" component="h3">Description
-                            {task.description ?
-                                    <IconButton size="small"><EditIcon /></IconButton> :
-                                    <IconButton size="small"><AddIcon /></IconButton>
-                                }
-                            </Typography>
-                            <Typography variant="body2" component="p">{task.description}</Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={3}>
-                            <FormControl>
-                                <FormLabel>
-                                    Checklist
-                                {task.checklist && task.checklist.length > 0 ?
                                         <IconButton size="small"><EditIcon /></IconButton> :
                                         <IconButton size="small"><AddIcon /></IconButton>
                                     }
-                                </FormLabel>
-                                <FormGroup>
-                                    {task.checklist && task.checklist
-                                        .map((item, index) => <FormControlLabel control={<Checkbox />} key={index} label={item} />)}
-                                </FormGroup>
-                            </FormControl>
+                                </Typography>
+                                <Typography variant="body2" component="p">{task.dueDate && task.dueDate.toString()}</Typography>
+                            </Grid>
+                            <Grid item xs={12} sm={9}>
+                                <Typography variant="body1" component="h3">Description
+                            {task.description ?
+                                        <IconButton size="small"><EditIcon /></IconButton> :
+                                        <IconButton size="small"><AddIcon /></IconButton>
+                                    }
+                                </Typography>
+                                <Typography variant="body2" component="p">{task.description}</Typography>
+                            </Grid>
+                            <Grid item xs={12} sm={3}>
+                                <FormControl>
+                                    <FormLabel>
+                                        Checklist
+                                {task.checklist && task.checklist.length > 0 ?
+                                            <IconButton size="small"><EditIcon /></IconButton> :
+                                            <IconButton size="small"><AddIcon /></IconButton>
+                                        }
+                                    </FormLabel>
+                                    <FormGroup>
+                                        {task.checklist && task.checklist
+                                            .map((item, index) => <FormControlLabel control={<Checkbox />} key={index} label={item} />)}
+                                    </FormGroup>
+                                </FormControl>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Typography variant="body1" component="h3">Comments</Typography>
+                                <CommentForm />
+                                {task.comments && task.comments.length > 0 &&
+                                    task.comments.map(comment => <CommentCard key={comment.id} comment={comment} />)}
+                            </Grid>
                         </Grid>
-                        <Grid item xs={12}>
-                            <Typography variant="body1" component="h3">Comments</Typography>
-                            <CommentForm />
-                            {task.comments && task.comments.length > 0 &&
-                                task.comments.map(comment => <CommentCard key={comment.id} comment={comment} />)}
-                        </Grid>
-                    </Grid>
-                </DialogContent >
-            </Dialog >
-            <TaskImage isOpenImg={isOpenImg} handleCloseImg={handleCloseImg} image={task.image} />
+                    </DialogContent >
+                </Dialog >
+                <TaskImage isOpenImg={isOpenImg} handleCloseImg={handleCloseImg} image={task.image} />
+            </>}
         </>
     )
 }

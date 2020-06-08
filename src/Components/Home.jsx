@@ -1,14 +1,13 @@
-import React from 'react';
-import { Grid } from '@material-ui/core';
+import React, { useContext } from 'react';
+import { Grid, LinearProgress } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import BoardCard from './Board/BoardCard'
 import BoardCardForm from './Board/BoardCardForm'
-import { boards } from '../data'
+import { BoardsContext } from '../providers/BoardsProvider';
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        // backgroundColor: '#934054',
         paddingTop: theme.spacing(1),
         display: 'flex',
         flexDirection: 'row',
@@ -25,23 +24,25 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: theme.palette.primary.dark,
             borderRadius: '0.8em'
         }
-    },
+    }
 }));
 
 export default function Home() {
     const classes = useStyles();
+    const { boards, loading } = useContext(BoardsContext)
 
-    return (
-        <Container className={classes.root}>
-            <Grid container>
-                {boards.map((board, index) => (
-                    <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
-                        <BoardCard boardName={board} card />
-                    </Grid>))}
-                <Grid item xs={12} sm={6} md={4} lg={3}>
-                    <BoardCardForm card />
+    return (<>{
+        loading ? <LinearProgress color="secondary" /> :
+            < Container className={classes.root} >
+                <Grid container>
+                    {boards.map((board) => (
+                        <Grid item key={board.id} xs={12} sm={6} md={4} lg={3}>
+                            <BoardCard boardTitle={board.title} boardId={board.id} card />
+                        </Grid>))}
+                    <Grid item xs={12} sm={6} md={4} lg={3}>
+                        <BoardCardForm card />
+                    </Grid>
                 </Grid>
-            </Grid>
-        </Container>
-    )
+            </Container >
+    }</>)
 }

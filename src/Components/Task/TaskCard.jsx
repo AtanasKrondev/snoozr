@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
@@ -12,6 +12,8 @@ import ScheduleIcon from '@material-ui/icons/Schedule';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
 
 import TaskDetails from './TaskDetails'
+import { tasksRef } from '../../firebase';
+import { CircularProgress } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -31,44 +33,53 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-export default function TaskCard({ task }) {
+export default function TaskCard({ id }) {
     const classes = useStyles();
     const [isOpen, setIsOpen] = useState(false);
-
     const handleOpen = () => setIsOpen(true);
     const handleClose = () => setIsOpen(false);
+
+    const [task, setTask] = useState(null);
+    const [loading, setLoading] = useState(true)
+    useEffect(() => tasksRef.doc(id).onSnapshot(snapshot => {
+        setLoading(true)
+        const data = snapshot.data();
+        setTask({ id, ...data });
+        setLoading(false);
+    }), [id])
 
     return (
         <>
             <Card raised className={classes.root}>
-                <CardActionArea onClick={handleOpen}>
-                    {task.image && <CardMedia
-                        className={classes.media}
-                        image={task.image}
-                        title="Task Image"
-                    />}
-                    <CardContent className={classes.content}>
-                        <Typography variant="body2" component="p">
-                            {task.title}
-                        </Typography>
-                    </CardContent>
-                    <CardActions className={classes.actions}>
-                        {task.description && <SubjectIcon />}
-                        {task.comments && task.comments.length > 0 && <>
-                            <CommentIcon />
-                            {task.comments.length}</>}
-                        {task.checklist && task.checklist.length > 0 && <>
-                            <CheckBoxIcon />
-                            {task.checklist.length}
-                        </>}
-                        {task.dueDate && <>
-                            <ScheduleIcon />
-                            {task.dueDate.toDateString()}
-                        </>}
-                    </CardActions>
-                </CardActionArea>
+                {loading ? <CircularProgress color="secondary" />
+                    : <CardActionArea onClick={handleOpen}>
+                        {task.image && <CardMedia
+                            className={classes.media}
+                            image={task.image}
+                            title="Task Image"
+                        />}
+                        <CardContent className={classes.content}>
+                            <Typography variant="body2" component="p">
+                                {task.title}
+                            </Typography>
+                        </CardContent>
+                        <CardActions className={classes.actions}>
+                            {task.description && <SubjectIcon />}
+                            {task.comments && task.comments.length > 0 && <>
+                                <CommentIcon />
+                                {task.comments.length}</>}
+                            {task.checklist && task.checklist.length > 0 && <>
+                                <CheckBoxIcon />
+                                {task.checklist.length}
+                            </>}
+                            {task.dueDate && <>
+                                <ScheduleIcon />
+                                {task.dueDate.toDateString()}
+                            </>}
+                        </CardActions>
+                    </CardActionArea>}
             </Card >
-            <TaskDetails isOpen={isOpen} handleClose={handleClose} task={task} />
+            <TaskDetails isOpen={isOpen} handleClose={handleClose} id={id} />
         </>
     );
 }

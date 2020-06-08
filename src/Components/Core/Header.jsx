@@ -25,13 +25,13 @@ export default function Header({ onClick }) {
     <>
       <AppBar position="sticky">
         <Toolbar>
-          <IconButton edge="start" color="inherit" onClick={onClick}>
+          <IconButton edge="start" onClick={onClick} disabled={!user}>
             <MenuIcon />
           </IconButton>
           <Box flexGrow={1}>
           </Box>
           <Button
-            color="inherit"
+
             startIcon={<SnoozeIcon />}
             component={Link}
             to="/"
@@ -41,7 +41,7 @@ export default function Header({ onClick }) {
           <Box flexGrow={1}>
           </Box>
           {loading ? <CircularProgress color="secondary" /> :
-            user ? <IconButton color="inherit" onClick={handleMenuOpen}>
+            user ? <IconButton onClick={handleMenuOpen}>
               {
                 user.photoURL ?
                   <Avatar alt={user.displayName} src={user.photoURL} />
@@ -49,7 +49,7 @@ export default function Header({ onClick }) {
               }
             </IconButton> :
               <Button
-                color="inherit"
+
                 startIcon={<ExitToAppIcon />}
                 component={Link}
                 to="/signin"
