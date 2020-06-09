@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Formik } from 'formik';
-import * as Yup from 'yup';
 import { useHistory } from 'react-router-dom'
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -12,6 +11,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 
 import { auth, usersRef } from '../../firebase'
+import { userSignup } from '../../vaildators';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -70,21 +70,7 @@ export default function SignUp() {
             .then(() => history.push('/profile'))
             .catch(error => console.error(error))
         }}
-        validationSchema={Yup.object().shape({
-          displayName: Yup.string()
-            .required('Name is required')
-            .min(3, 'Name must be at least 3 symbols'),
-          photoURL: Yup.string()
-            .matches('^https?://.*.(jpe?g|png|gif)$', 'Invalid image URL format'),
-          email: Yup.string()
-            .required('E-mail is required')
-            .email('Invalid E-mail format'),
-          password: Yup.string()
-            .required('Password is required')
-            .min(6, 'Password must be at least 6 symbols'),
-          rePassword: Yup.string()
-            .oneOf([Yup.ref('password')], 'Passwords do not match')
-        })}
+        validationSchema={userSignup}
       >{({ touched, errors, getFieldProps, handleSubmit }) => (
         <form className={classes.form} onSubmit={handleSubmit}>
           <TextField

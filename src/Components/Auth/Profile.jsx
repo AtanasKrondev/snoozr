@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
 import { Formik } from 'formik';
-import * as Yup from 'yup';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
@@ -13,6 +12,7 @@ import SaveIcon from '@material-ui/icons/Save';
 import UndoIcon from '@material-ui/icons/Undo';
 import { ButtonGroup, ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import { userProfile, userCredentials, changePassword } from '../../vaildators';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -78,13 +78,7 @@ export default function SignIn() {
                                 .then(() => usersRef.doc(user.uid).set({ displayName, photoURL }, { merge: true }))
                                 .catch(error => console.error(error))
                         }}
-                        validationSchema={Yup.object().shape({
-                            displayName: Yup.string()
-                                .required('Name is required')
-                                .min(3, 'Name must be at least 3 symbols'),
-                            photoURL: Yup.string()
-                                .matches('^https?://.*.(jpe?g|png|gif)$', 'Invalid image URL format'),
-                        })}
+                        validationSchema={userProfile}
                     >{({ touched, errors, getFieldProps, handleSubmit, handleReset }) => (
                         <form className={classes.form} onSubmit={handleSubmit}>
                             <TextField
@@ -128,21 +122,14 @@ export default function SignIn() {
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails>
                     <Formik
-                        initialValues={{ email: user.email, passwordE: '' }}
-                        onSubmit={({ email, passwordE }, { resetForm }) => {
-                            auth.signInWithEmailAndPassword(user.email, passwordE)
+                        initialValues={{ email: user.email, password: '' }}
+                        onSubmit={({ email, password }, { resetForm }) => {
+                            auth.signInWithEmailAndPassword(user.email, password)
                                 .then(() => auth.currentUser.updateEmail(email))
                                 .catch(error => console.error(error));
                             resetForm();
                         }}
-                        validationSchema={Yup.object().shape({
-                            email: Yup.string()
-                                .required('E-mail is required')
-                                .email('Invalid E-mail format'),
-                            passwordE: Yup.string()
-                                .required('Password is required')
-                                .min(6, 'Password must be at least 6 symbols'),
-                        })}
+                        validationSchema={userCredentials}
                     >{({ touched, errors, getFieldProps, handleSubmit, handleReset }) => (
                         <form className={classes.form} onSubmit={handleSubmit}>
                             <TextField
@@ -162,13 +149,13 @@ export default function SignIn() {
                                 margin="normal"
                                 required
                                 fullWidth
-                                id="passwordE"
+                                id="password"
                                 label="Current Password"
                                 type="password"
                                 autoComplete="current-password"
-                                error={!!touched.passwordE && !!errors.passwordE}
-                                helperText={(touched.passwordE && errors.passwordE) && errors.passwordE}
-                                {...getFieldProps('passwordE')}
+                                error={!!touched.password && !!errors.password}
+                                helperText={(touched.password && errors.password) && errors.password}
+                                {...getFieldProps('password')}
                             />
                             <ButtonGroup fullWidth variant="contained" color="primary">
                                 <Button startIcon={<UndoIcon />} onClick={handleReset}>Reset</Button>
@@ -194,16 +181,7 @@ export default function SignIn() {
                                 .catch(error => console.error(error))
                             resetForm();
                         }}
-                        validationSchema={Yup.object().shape({
-                            passwordC: Yup.string()
-                                .required('Current password is required')
-                                .min(6, 'Password must be at least 6 symbols'),
-                            newPassword: Yup.string()
-                                .required('New password is required')
-                                .min(6, 'Password must be at least 6 symbols'),
-                            rePassword: Yup.string()
-                                .oneOf([Yup.ref('newPassword')], 'Passwords do not match')
-                        })}
+                        validationSchema={changePassword}
                     >{({ touched, errors, getFieldProps, handleSubmit, handleReset }) => (
                         <form className={classes.form} onSubmit={handleSubmit}>
                             <TextField

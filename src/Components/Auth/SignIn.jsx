@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
-import * as Yup from 'yup';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
@@ -10,6 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { auth } from '../../firebase';
+import { userCredentials } from '../../vaildators';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -67,14 +67,7 @@ export default function SignIn() {
             .then(() => history.push('/'))
             .catch(error => console.error(error))
         }}
-        validationSchema={Yup.object().shape({
-          email: Yup.string()
-            .required('E-mail is required')
-            .email('Invalid E-mail format'),
-          password: Yup.string()
-            .required('Password is required')
-            .min(6, 'Password must be at least 6 symbols')
-        })}
+        validationSchema={userCredentials}
       >{({ touched, errors, getFieldProps, handleSubmit }) => (
         <form className={classes.form} onSubmit={handleSubmit}>
           <TextField

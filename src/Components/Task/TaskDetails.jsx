@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Dialog from '@material-ui/core/Dialog';
-import { DialogTitle, DialogContent, IconButton, FormControl, FormLabel, FormGroup, FormControlLabel, CircularProgress } from '@material-ui/core';
+import {
+    DialogTitle, DialogContent, IconButton, FormControl, FormLabel,
+    FormGroup, FormControlLabel, CircularProgress, TextField
+} from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import ImageIcon from '@material-ui/icons/Image';
@@ -14,6 +17,9 @@ import CommentCard from '../Comment/CommentCard';
 import TaskImage from './TaskImage'
 import CommentForm from '../Comment/CommentForm'
 import { tasksRef } from '../../firebase';
+import SaveIcon from '@material-ui/icons/Save';
+import { Formik } from 'formik';
+import { title, description } from '../../vaildators';
 
 const useStyles = makeStyles(theme => ({
     cover: {
@@ -52,12 +58,18 @@ export default function TaskDetails({ isOpen, handleClose, id }) {
     const classes = useStyles();
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
-    const [isOpenImg, setIsOpenImg] = useState(false);
-    const handleOpenImg = () => setIsOpenImg(true);
-    const handleCloseImg = () => setIsOpenImg(false);
-
     const [task, setTask] = useState(null);
     const [loading, setLoading] = useState(true)
+
+    const [isOpenImg, setIsOpenImg] = useState(false);
+    const handleOpenImg = () => setIsOpenImg(!isOpenImg);
+
+    const [editTitle, setEditTitle] = useState(false);
+    const handleEditTitle = () => setEditTitle(!editTitle)
+
+    const [editDescription, setEditDescription] = useState(false);
+    const handleEditDescription = () => setEditDescription(!editDescription)
+
     useEffect(() => tasksRef.doc(id).onSnapshot(snapshot => {
         setLoading(true)
         const data = snapshot.data();
@@ -75,7 +87,29 @@ export default function TaskDetails({ isOpen, handleClose, id }) {
                         <IconButton className={classes.bottomRight} onClick={handleOpenImg} ><ImageIcon /></IconButton>
                         <Typography className={classes.bottomLeft} variant="subtitle2">in list: To DO</Typography>
                     </div>
-                    <DialogTitle>{task.title}
+                    <DialogTitle>
+                        {editTitle ?
+                            <Formik
+                                initialValues={{ title: task.title || '' }}
+                                onSubmit={({ title }) => {
+                                    tasksRef.doc(id).set({ title }, { merge: true })
+                                        .then(() => handleEditTitle())
+                                        .catch(error => console.log(error))
+                                }}
+                                validationSchema={title}>
+                                {({ touched, errors, getFieldProps, handleSubmit }) => (
+                                    <form onSubmit={handleSubmit}>
+                                        <TextField
+                                            id="title"
+                                            error={touched.title && !!errors.title}
+                                            helperText={errors.title}
+                                            {...getFieldProps('title')}
+                                        />
+                                        <IconButton size="small" type="submit"><SaveIcon /></IconButton>
+                                        <IconButton size="small" onClick={handleEditTitle}><CloseIcon /></IconButton>
+                                    </form>)}
+                            </Formik> :
+                            <>{task.title}<IconButton size="small" onClick={handleEditTitle}><EditIcon /></IconButton></>}
                     </DialogTitle>
                     <DialogContent>
                         <Grid container spacing={1}>
@@ -90,12 +124,31 @@ export default function TaskDetails({ isOpen, handleClose, id }) {
                             </Grid>
                             <Grid item xs={12} sm={9}>
                                 <Typography variant="body1" component="h3">Description
-                            {task.description ?
-                                        <IconButton size="small"><EditIcon /></IconButton> :
-                                        <IconButton size="small"><AddIcon /></IconButton>
-                                    }
+                                <IconButton size="small" onClick={handleEditDescription}>{task.description ? <EditIcon /> : <AddIcon />}</IconButton>
                                 </Typography>
-                                <Typography variant="body2" component="p">{task.description}</Typography>
+                                {editDescription ? <Formik
+                                    initialValues={{ description: task.description || '' }}
+                                    onSubmit={({ description }) => {
+                                        tasksRef.doc(id).set({ description }, { merge: true })
+                                            .then(() => handleEditDescription())
+                                            .catch(error => console.log(error))
+                                    }}
+                                    validationSchema={description}>
+                                    {({ touched, errors, getFieldProps, handleSubmit }) => (
+                                        <form onSubmit={handleSubmit}>
+                                            <TextField
+                                                onBlur={handleEditDescription}
+                                                id="description"
+                                                error={touched.description && !!errors.description}
+                                                helperText={errors.description}
+                                                {...getFieldProps('description')}
+                                            />
+                                            <IconButton size="small" type="submit"><SaveIcon /></IconButton>
+                                            <IconButton size="small" onClick={handleEditDescription}><CloseIcon /></IconButton>
+                                        </form>)}
+                                </Formik>
+                                    : <Typography variant="body1" component="p">{task.description}</Typography>
+                                }
                             </Grid>
                             <Grid item xs={12} sm={3}>
                                 <FormControl>
@@ -121,7 +174,7 @@ export default function TaskDetails({ isOpen, handleClose, id }) {
                         </Grid>
                     </DialogContent >
                 </Dialog >
-                <TaskImage isOpenImg={isOpenImg} handleCloseImg={handleCloseImg} image={task.image} />
+                <TaskImage isOpenImg={isOpenImg} handleCloseImg={handleOpenImg} id={id} image={task.image} />
             </>}
         </>
     )

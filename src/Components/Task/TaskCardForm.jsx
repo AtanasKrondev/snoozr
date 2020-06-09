@@ -5,7 +5,7 @@ import { IconButton, FormControl, InputLabel, InputAdornment, FormHelperText } f
 import AddIcon from '@material-ui/icons/Add';
 import OutlinedInput from '@material-ui/core/OutlinedInput';
 import { Formik } from 'formik';
-import * as Yup from 'yup';
+import { title } from '../../vaildators'
 import { listsRef, tasksRef, fieldValue } from '../../firebase';
 import { useContext } from 'react';
 import { UserContext } from '../../providers/UserProvider';
@@ -27,10 +27,10 @@ export default function TaskCardForm({ listId }) {
     return (
         <Card raised className={classes.root} >
             <Formik
-                initialValues={{ taskTitle: '' }}
-                onSubmit={({ taskTitle }) => {
+                initialValues={{ title: '' }}
+                onSubmit={({ title }) => {
                     const author = user ? user.uid : '';
-                    const addTask = tasksRef.add({ title: taskTitle, author });
+                    const addTask = tasksRef.add({ title, author });
                     const lastPosition = list.set({ taskCount: fieldValue.increment(1) }, { merge: true });
                     Promise.all([addTask, lastPosition])
                         .then(
@@ -40,22 +40,19 @@ export default function TaskCardForm({ listId }) {
                         )
                         .catch(error => console.error(error))
                 }}
-                validationSchema={Yup.object().shape({
-                    taskTitle: Yup.string()
-                        .required('Enter a title')
-                })}>
+                validationSchema={title}>
                 {({ touched, errors, getFieldProps, handleSubmit }) => (
-                    <FormControl fullWidth error={touched.taskTitle && !!errors.taskTitle} >
-                        <InputLabel htmlFor={`taskTitle${listId}`} variant="filled">Add Task</InputLabel>
-                        <OutlinedInput id={`taskTitle${listId}`} type="text" className={classes.input}
-                            {...getFieldProps('taskTitle')}
+                    <FormControl fullWidth error={touched.title && !!errors.title} >
+                        <InputLabel htmlFor={`title${listId}`} variant="filled">Add Task</InputLabel>
+                        <OutlinedInput id={`title${listId}`} type="text" className={classes.input}
+                            {...getFieldProps('title')}
                             endAdornment={
                                 <InputAdornment position="end">
                                     <IconButton onClick={handleSubmit}><AddIcon /></IconButton>
                                 </InputAdornment>
                             }
                         />
-                        <FormHelperText>{errors.taskTitle}</FormHelperText>
+                        <FormHelperText>{errors.title}</FormHelperText>
                     </FormControl>
                 )}
             </Formik>

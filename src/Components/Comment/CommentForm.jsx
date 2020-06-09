@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import { FormControl, Button, Grid } from '@material-ui/core';
 import SendIcon from '@material-ui/icons/Send';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
+import { UserContext } from '../../providers/UserProvider';
 
 const useStyles = makeStyles(theme => ({
     form: {
@@ -17,10 +18,14 @@ const useStyles = makeStyles(theme => ({
 
 export default function CommentForm() {
     const classes = useStyles();
+    const { user } = useContext(UserContext)
 
     return (
         <div className={classes.form} >
-            <Avatar className={classes.avatar}>A</Avatar>
+            {user.photoURL ?
+                <Avatar alt={user.displayName} src={user.photoURL} className={classes.avatar} />
+                : <Avatar className={classes.avatar}>{user.displayName && user.displayName[0]} </Avatar>
+            }
             <FormControl fullWidth>
                 <TextField
                     fullWidth
@@ -28,7 +33,6 @@ export default function CommentForm() {
                     multiline
                     rows={1}
                     rowsMax={4}
-                // variant="outlined"
                 />
                 <Grid container alignItems="flex-start" justify="flex-end" direction="row">
                     <Button endIcon={<SendIcon />} color="primary">Send</Button>

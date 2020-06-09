@@ -5,9 +5,9 @@ import { IconButton, FormControl, InputLabel, InputAdornment } from '@material-u
 import AddIcon from '@material-ui/icons/Add';
 import OutlinedInput from '@material-ui/core/OutlinedInput';
 import { Formik } from 'formik';
-import * as Yup from 'yup';
 import { boardsRef, listsRef, fieldValue } from '../../firebase';
 import { UserContext } from '../../providers/UserProvider';
+import { title } from '../../vaildators';
 
 const useStyles = makeStyles((theme) => ({
     list: {
@@ -30,10 +30,10 @@ export default function TaskListForm({ boardId }) {
     return (
         <Paper className={classes.list} >
             <Formik
-                initialValues={{ listTitle: '' }}
-                onSubmit={({ listTitle }) => {
+                initialValues={{ title: '' }}
+                onSubmit={({ title }) => {
                     const author = user ? user.uid : '';
-                    const addList = listsRef.add({ title: listTitle, tasks: [], author, taskCount: 0 });
+                    const addList = listsRef.add({ title, tasks: [], author, taskCount: 0 });
                     const lastPosition = board.set({ listCount: fieldValue.increment(1) }, { merge: true });
                     Promise.all([addList, lastPosition])
                         .then(
@@ -43,22 +43,19 @@ export default function TaskListForm({ boardId }) {
                         )
                         .catch(error => console.error(error))
                 }}
-                validationSchema={Yup.object().shape({
-                    listTitle: Yup.string()
-                        .required('Enter a title')
-                })}>
+                validationSchema={title}>
                 {({ touched, errors, getFieldProps, handleSubmit }) => (
-                    <FormControl fullWidth error={touched.listTitle && !!errors.listTitle} >
-                        <InputLabel htmlFor="listTitle" variant="filled">Add List</InputLabel>
-                        <OutlinedInput id="listTitle" type="text" className={classes.input}
-                            {...getFieldProps('listTitle')}
+                    <FormControl fullWidth error={touched.title && !!errors.title} >
+                        <InputLabel htmlFor="title" variant="filled">Add List</InputLabel>
+                        <OutlinedInput id="title" type="text" className={classes.input}
+                            {...getFieldProps('title')}
                             endAdornment={
                                 <InputAdornment position="end">
                                     <IconButton onClick={handleSubmit}><AddIcon /></IconButton>
                                 </InputAdornment>
                             }
                         />
-                        <FormHelperText>{errors.listTitle}</FormHelperText>
+                        <FormHelperText>{errors.title}</FormHelperText>
                     </FormControl>
                 )}
             </Formik>

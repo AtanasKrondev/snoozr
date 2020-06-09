@@ -2,9 +2,9 @@ import React, { useContext } from 'react';
 import { Card, makeStyles, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton, FormHelperText } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import { Formik } from 'formik';
-import * as Yup from 'yup';
 import { boardsRef } from '../../firebase'
 import { UserContext } from '../../providers/UserProvider';
+import { title } from '../../vaildators';
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -26,10 +26,7 @@ export default function BoardCardForm({ card }) {
                         .catch(error => console.error(error))
                     resetForm();
                 }}
-                validationSchema={Yup.object().shape({
-                    title: Yup.string()
-                        .required('Enter a title')
-                })}>
+                validationSchema={title}>
                 {({ touched, errors, getFieldProps, handleSubmit }) => (
                     <FormControl fullWidth error={touched.title && !!errors.title}>
                         <InputLabel htmlFor="title" variant="filled">Add Board</InputLabel>
