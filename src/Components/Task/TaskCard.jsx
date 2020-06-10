@@ -14,6 +14,7 @@ import CheckBoxIcon from '@material-ui/icons/CheckBox';
 import TaskDetails from './TaskDetails'
 import { tasksRef } from '../../firebase';
 import { CircularProgress } from '@material-ui/core';
+import moment from 'moment'
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -64,17 +65,17 @@ export default function TaskCard({ id }) {
                             </Typography>
                         </CardContent>
                         <CardActions className={classes.actions}>
-                            {task.description && <SubjectIcon />}
+                            {task.description && <SubjectIcon fontSize="small" />}
                             {task.comments && task.comments.length > 0 && <>
-                                <CommentIcon />
+                                <CommentIcon fontSize="small" />
                                 {task.comments.length}</>}
                             {task.checklist && task.checklist.length > 0 && <>
-                                <CheckBoxIcon />
+                                <CheckBoxIcon fontSize="small" />
                                 {task.checklist.length}
                             </>}
                             {task.dueDate && <>
-                                <ScheduleIcon />
-                                {task.dueDate.toDateString()}
+                                <ScheduleIcon fontSize="small" />
+                                {moment.unix(task.dueDate.seconds).format('MMM D')}
                             </>}
                         </CardActions>
                     </CardActionArea>}

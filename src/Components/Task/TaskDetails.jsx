@@ -20,6 +20,8 @@ import { tasksRef } from '../../firebase';
 import SaveIcon from '@material-ui/icons/Save';
 import { Formik } from 'formik';
 import { title, description } from '../../vaildators';
+import TaskDatePicker from './TaskDatePicker';
+import moment from 'moment'
 
 const useStyles = makeStyles(theme => ({
     cover: {
@@ -65,10 +67,13 @@ export default function TaskDetails({ isOpen, handleClose, id }) {
     const handleOpenImg = () => setIsOpenImg(!isOpenImg);
 
     const [editTitle, setEditTitle] = useState(false);
-    const handleEditTitle = () => setEditTitle(!editTitle)
+    const handleEditTitle = () => setEditTitle(!editTitle);
 
     const [editDescription, setEditDescription] = useState(false);
-    const handleEditDescription = () => setEditDescription(!editDescription)
+    const handleEditDescription = () => setEditDescription(!editDescription);
+
+    const [editDueDate, setEditDueDate] = useState(false);
+    const handleEditDueDate = () => setEditDueDate(!editDueDate);
 
     useEffect(() => tasksRef.doc(id).onSnapshot(snapshot => {
         setLoading(true)
@@ -115,12 +120,17 @@ export default function TaskDetails({ isOpen, handleClose, id }) {
                         <Grid container spacing={1}>
                             <Grid item xs={12}>
                                 <Typography variant="body1" component="h3">Due Date
-                            {task.dueDate ?
-                                        <IconButton size="small"><EditIcon /></IconButton> :
-                                        <IconButton size="small"><AddIcon /></IconButton>
-                                    }
+                                {editDueDate ?
+                                        <IconButton size="small" onClick={handleEditDueDate}><CloseIcon /></IconButton>
+                                        : <IconButton size="small" onClick={handleEditDueDate}>
+                                            {task.dueDate ? <EditIcon /> : <AddIcon />}</IconButton>}
+
                                 </Typography>
-                                <Typography variant="body2" component="p">{task.dueDate && task.dueDate.toString()}</Typography>
+                                {editDueDate ?
+                                    <TaskDatePicker id={id} initDate={task.dueDate} close={handleEditDueDate} /> :
+                                    <Typography variant="body1" component="p">
+                                        {task.dueDate && moment.unix(task.dueDate.seconds).format('MMM Do HH:mm')}
+                                    </Typography>}
                             </Grid>
                             <Grid item xs={12} sm={9}>
                                 <Typography variant="body1" component="h3">Description
