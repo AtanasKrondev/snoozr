@@ -1,27 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import Dialog from '@material-ui/core/Dialog';
 import {
-    DialogTitle, DialogContent, IconButton, FormControl, FormLabel,
-    FormGroup, FormControlLabel, CircularProgress, TextField
+    DialogTitle, DialogContent, IconButton, CircularProgress, TextField
 } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import ImageIcon from '@material-ui/icons/Image';
 import Typography from '@material-ui/core/Typography';
 import CloseIcon from '@material-ui/icons/Close';
+import SaveIcon from '@material-ui/icons/Save';
 import EditIcon from '@material-ui/icons/Edit';
 import AddIcon from '@material-ui/icons/Add';
-import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
 import CommentCard from '../Comment/CommentCard';
 import TaskImage from './TaskImage'
 import CommentForm from '../Comment/CommentForm'
 import { tasksRef } from '../../firebase';
-import SaveIcon from '@material-ui/icons/Save';
 import { Formik } from 'formik';
 import { title, description } from '../../vaildators';
 import TaskDatePicker from './TaskDatePicker';
 import moment from 'moment'
+import TaskChecklist from './TaskChecklist';
 
 const useStyles = makeStyles(theme => ({
     cover: {
@@ -129,12 +128,15 @@ export default function TaskDetails({ isOpen, handleClose, id }) {
                                 {editDueDate ?
                                     <TaskDatePicker id={id} initDate={task.dueDate} close={handleEditDueDate} /> :
                                     <Typography variant="body1" component="p">
-                                        {task.dueDate && moment.unix(task.dueDate.seconds).format('MMM Do HH:mm')}
+                                        {task.dueDate && moment.unix(task.dueDate.seconds).format('MMMM Do HH:mm')}
                                     </Typography>}
                             </Grid>
                             <Grid item xs={12} sm={9}>
                                 <Typography variant="body1" component="h3">Description
-                                <IconButton size="small" onClick={handleEditDescription}>{task.description ? <EditIcon /> : <AddIcon />}</IconButton>
+                                {editDescription ?
+                                        <IconButton size="small" onClick={handleEditDescription}><CloseIcon /></IconButton>
+                                        : <IconButton size="small" onClick={handleEditDescription}>
+                                            {task.description ? <EditIcon /> : <AddIcon />}</IconButton>}
                                 </Typography>
                                 {editDescription ? <Formik
                                     initialValues={{ description: task.description || '' }}
@@ -151,6 +153,9 @@ export default function TaskDetails({ isOpen, handleClose, id }) {
                                                 id="description"
                                                 error={touched.description && !!errors.description}
                                                 helperText={errors.description}
+                                                multiline
+                                                rows={1}
+                                                rowsMax={4}
                                                 {...getFieldProps('description')}
                                             />
                                             <IconButton size="small" type="submit"><SaveIcon /></IconButton>
@@ -161,19 +166,7 @@ export default function TaskDetails({ isOpen, handleClose, id }) {
                                 }
                             </Grid>
                             <Grid item xs={12} sm={3}>
-                                <FormControl>
-                                    <FormLabel>
-                                        Checklist
-                                {task.checklist && task.checklist.length > 0 ?
-                                            <IconButton size="small"><EditIcon /></IconButton> :
-                                            <IconButton size="small"><AddIcon /></IconButton>
-                                        }
-                                    </FormLabel>
-                                    <FormGroup>
-                                        {task.checklist && task.checklist
-                                            .map((item, index) => <FormControlLabel control={<Checkbox />} key={index} label={item} />)}
-                                    </FormGroup>
-                                </FormControl>
+                                <TaskChecklist id={id} checklist={task.checklist} />
                             </Grid>
                             <Grid item xs={12}>
                                 <Typography variant="body1" component="h3">Comments</Typography>

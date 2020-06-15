@@ -71,7 +71,7 @@ export default function TaskCard({ id }) {
                                 {task.comments.length}</>}
                             {task.checklist && task.checklist.length > 0 && <>
                                 <CheckBoxIcon fontSize="small" />
-                                {task.checklist.length}
+                                {task.checklist.filter(a => a.checked).length}/{task.checklist.length}
                             </>}
                             {task.dueDate && <>
                                 <ScheduleIcon fontSize="small" />

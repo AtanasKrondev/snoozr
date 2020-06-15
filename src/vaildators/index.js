@@ -4,6 +4,10 @@ export const title = Yup.object().shape({
     title: Yup.string()
         .required('Enter a title')
 });
+export const item = Yup.object().shape({
+    item: Yup.string()
+        .required('Enter an item')
+});
 export const description = Yup.object().shape({
     description: Yup.string()
         .min(5, 'Description must be at least 5 symbols')

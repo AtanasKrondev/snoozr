@@ -27,6 +27,7 @@ export default function TaskDatePicker({ id, initDate, close }) {
                         autoOk
                         ampm={false}
                         disablePast
+                        showTodayButton
                         value={values.dueDate}
                         onChange={value => setFieldValue('dueDate', value.toDate())}
                         InputProps={{
