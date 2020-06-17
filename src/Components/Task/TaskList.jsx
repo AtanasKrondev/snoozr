@@ -39,7 +39,7 @@ export default function TaskList({ id }) {
         const data = snapshot.data();
         setList({ id, ...data });
         setLoading(false);
-    }), [id])
+    }, error => console.error(error)), [id])
 
 
     return (

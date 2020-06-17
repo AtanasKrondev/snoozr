@@ -22,3 +22,4 @@ export const usersRef = db.collection('users');
 export const boardsRef = db.collection('boards');
 export const listsRef = db.collection('lists');
 export const tasksRef = db.collection('tasks');
+export const commentsRef = db.collection('comments');

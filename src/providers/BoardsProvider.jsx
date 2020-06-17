@@ -22,7 +22,7 @@ export default function BoardsProvider({ children }) {
                 })
                 setBoards(boardsSnapshot);
                 setLoading(false);
-            });
+            }, error => console.error(error));
         return () => cleanUp();
     }, [user])
 

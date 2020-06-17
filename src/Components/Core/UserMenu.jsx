@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { Menu, MenuItem, ListItemIcon, ListItemText } from '@material-ui/core';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
-import SettingsIcon from '@material-ui/icons/Settings';
+// import SettingsIcon from '@material-ui/icons/Settings';
 import CloseIcon from '@material-ui/icons/Close';
 import { auth } from '../../firebase';
 
@@ -20,10 +20,10 @@ export default function UserMenu({ anchorEl, handleMenuClose }) {
                 <ListItemIcon><AccountCircleIcon /></ListItemIcon>
                 <ListItemText primary="Profile" />
             </MenuItem>
-            <MenuItem>
-                <ListItemIcon><SettingsIcon /></ListItemIcon>
-                <ListItemText primary="Settings" />
-            </MenuItem>
+                {/* <MenuItem>
+                    <ListItemIcon><SettingsIcon /></ListItemIcon>
+                    <ListItemText primary="Settings" />
+                </MenuItem> */}
             <MenuItem onClick={() => {
                 auth.signOut()
                     .then(() => history.push('/'))

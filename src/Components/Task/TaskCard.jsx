@@ -47,7 +47,7 @@ export default function TaskCard({ id }) {
         const data = snapshot.data();
         setTask({ id, ...data });
         setLoading(false);
-    }), [id])
+    }, error => console.error(error)), [id])
 
     return (
         <>

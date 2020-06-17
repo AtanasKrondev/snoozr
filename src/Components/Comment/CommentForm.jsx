@@ -5,6 +5,9 @@ import SendIcon from '@material-ui/icons/Send';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { UserContext } from '../../providers/UserProvider';
+import { Formik } from 'formik';
+import { comment as commentSchema } from '../../vaildators';
+import { commentsRef, fieldValue } from '../../firebase';
 
 const useStyles = makeStyles(theme => ({
     form: {
@@ -16,7 +19,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-export default function CommentForm() {
+export default function CommentForm({ task }) {
     const classes = useStyles();
     const { user } = useContext(UserContext)
 
@@ -26,18 +29,33 @@ export default function CommentForm() {
                 <Avatar alt={user.displayName} src={user.photoURL} className={classes.avatar} />
                 : <Avatar className={classes.avatar}>{user.displayName && user.displayName[0]} </Avatar>
             }
-            <FormControl fullWidth>
-                <TextField
-                    fullWidth
-                    placeholder="Write your comment..."
-                    multiline
-                    rows={1}
-                    rowsMax={4}
-                />
-                <Grid container alignItems="flex-start" justify="flex-end" direction="row">
-                    <Button endIcon={<SendIcon />} color="primary">Send</Button>
-                </Grid>
-            </FormControl>
+            <Formik
+                initialValues={{ comment: '' }}
+                validationSchema={commentSchema}
+                onSubmit={({ comment }, { resetForm }) => {
+                    commentsRef.add({ comment, author: user.uid, task, timestamp: fieldValue.serverTimestamp() })
+                        .then(() => resetForm())
+                        .catch(error => console.error(error))
+                }}>
+                {({ touched, errors, getFieldProps, handleSubmit }) => (
+                    <FormControl fullWidth>
+                        <TextField
+                            fullWidth
+                            id="comment"
+                            error={touched.comment && !!errors.comment}
+                            placeholder="Write your comment..."
+                            multiline
+                            rows={1}
+                            rowsMax={4}
+                            helperText={errors.comment}
+                            {...getFieldProps('comment')}
+                        />
+                        <Grid container alignItems="flex-start" justify="flex-end" direction="row">
+                            <Button onClick={handleSubmit} endIcon={<SendIcon />} color="primary">Send</Button>
+                        </Grid>
+                    </FormControl>
+                )}
+            </Formik>
         </div>
     )
 }

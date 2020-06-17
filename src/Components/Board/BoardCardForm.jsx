@@ -23,8 +23,8 @@ export default function BoardCardForm({ card }) {
                 onSubmit={({ title }, { resetForm }) => {
                     const author = user ? user.uid : '';
                     boardsRef.add({ title, author, lists: [], listCount: 0 })
+                        .then(() => resetForm())
                         .catch(error => console.error(error))
-                    resetForm();
                 }}
                 validationSchema={title}>
                 {({ touched, errors, getFieldProps, handleSubmit }) => (

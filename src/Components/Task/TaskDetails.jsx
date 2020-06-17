@@ -12,15 +12,14 @@ import SaveIcon from '@material-ui/icons/Save';
 import EditIcon from '@material-ui/icons/Edit';
 import AddIcon from '@material-ui/icons/Add';
 import Grid from '@material-ui/core/Grid';
-import CommentCard from '../Comment/CommentCard';
 import TaskImage from './TaskImage'
-import CommentForm from '../Comment/CommentForm'
 import { tasksRef } from '../../firebase';
 import { Formik } from 'formik';
 import { title, description } from '../../vaildators';
 import TaskDatePicker from './TaskDatePicker';
 import moment from 'moment'
 import TaskChecklist from './TaskChecklist';
+import CommentContainer from '../Comment/CommentContainer';
 
 const useStyles = makeStyles(theme => ({
     cover: {
@@ -79,7 +78,7 @@ export default function TaskDetails({ isOpen, handleClose, id }) {
         const data = snapshot.data();
         setTask({ id, ...data });
         setLoading(false);
-    }), [id])
+    }, error => console.error(error)), [id])
 
     return (
         <>
@@ -170,9 +169,7 @@ export default function TaskDetails({ isOpen, handleClose, id }) {
                             </Grid>
                             <Grid item xs={12}>
                                 <Typography variant="body1" component="h3">Comments</Typography>
-                                <CommentForm />
-                                {task.comments && task.comments.length > 0 &&
-                                    task.comments.map(comment => <CommentCard key={comment.id} comment={comment} />)}
+                                <CommentContainer task={id} />
                             </Grid>
                         </Grid>
                     </DialogContent >

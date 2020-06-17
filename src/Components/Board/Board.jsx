@@ -52,7 +52,7 @@ export default function Board() {
             setBoard({ id, ...data });
             setLoading(false);
         } else history.push('/404')
-    }), [id, history])
+    }, error => console.error(error)), [id, history])
 
     return (<>{loading ? <LinearProgress color="secondary" /> : <>
         <Box className={classes.title}>
