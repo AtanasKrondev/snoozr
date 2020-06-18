@@ -7,13 +7,15 @@ export const title = Yup.object().shape({
 export const item = Yup.object().shape({
     item: Yup.string()
         .required('Enter an item')
+        .max(120, 'Item must be less than 120 symbols')
 });
 export const checklist = Yup.object().shape({
     checklist: Yup.array()
         .of(
             Yup.object().shape({
                 item: Yup.string()
-                    .required('Enter an item'),
+                    .required('Enter an item')
+                    .max(120, 'Item must be less than 120 symbols')
             })
         )
 });

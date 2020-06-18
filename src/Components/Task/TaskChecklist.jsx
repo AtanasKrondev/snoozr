@@ -4,6 +4,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import EditIcon from '@material-ui/icons/Edit';
 import SaveIcon from '@material-ui/icons/Save';
 import AddIcon from '@material-ui/icons/Add';
+import DeleteIcon from '@material-ui/icons/Delete';
 import { Formik, FieldArray } from 'formik';
 import { tasksRef, fieldValue } from '../../firebase';
 import { item, checklist as checklistSchema } from '../../vaildators';
@@ -58,6 +59,7 @@ export default function TaskChecklist({ checklist, id }) {
                                                     helperText={errors.checklist && errors.checklist[index] && errors.checklist[index].item}
                                                     {...getFieldProps(`checklist.${index}.item`)}
                                                 />
+                                                <IconButton onClick={() => { arrayHelpers.remove(index) }}><DeleteIcon /></IconButton>
                                             </form>
                                             : item}
                                         onChange={() => {

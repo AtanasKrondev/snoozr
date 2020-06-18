@@ -57,7 +57,7 @@ export default function TaskCard({ id }) {
                         {task.image && <CardMedia
                             className={classes.media}
                             image={task.image}
-                            title="Task Image"
+                            title={task.title}
                         />}
                         <CardContent className={classes.content}>
                             <Typography variant="body2" component="p">

@@ -7,7 +7,7 @@ import TextField from '@material-ui/core/TextField';
 import { UserContext } from '../../providers/UserProvider';
 import { Formik } from 'formik';
 import { comment as commentSchema } from '../../vaildators';
-import { commentsRef, fieldValue } from '../../firebase';
+import { commentsRef, fieldValue, tasksRef } from '../../firebase';
 
 const useStyles = makeStyles(theme => ({
     form: {
@@ -34,7 +34,10 @@ export default function CommentForm({ task }) {
                 validationSchema={commentSchema}
                 onSubmit={({ comment }, { resetForm }) => {
                     commentsRef.add({ comment, author: user.uid, task, timestamp: fieldValue.serverTimestamp() })
-                        .then(() => resetForm())
+                        .then(({ id }) => {
+                            tasksRef.doc(task).set({ comments: fieldValue.arrayUnion(id) }, { merge: true })
+                            resetForm()
+                        })
                         .catch(error => console.error(error))
                 }}>
                 {({ touched, errors, getFieldProps, handleSubmit }) => (

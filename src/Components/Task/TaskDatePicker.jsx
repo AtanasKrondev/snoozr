@@ -9,6 +9,7 @@ import { InputAdornment, IconButton } from '@material-ui/core';
 import { timeStamp, tasksRef } from '../../firebase';
 import { Formik } from 'formik';
 import SaveIcon from '@material-ui/icons/Save';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 export default function TaskDatePicker({ id, initDate, close }) {
     const dueDate = initDate ? initDate.toDate() : new Date()
@@ -16,10 +17,14 @@ export default function TaskDatePicker({ id, initDate, close }) {
     return (
         <Formik
             initialValues={{ dueDate }}
-            onSubmit={({ dueDate }) => tasksRef.doc(id)
+            onSubmit={({ dueDate }) => dueDate ? tasksRef.doc(id)
                 .set({ dueDate: timeStamp.fromDate(dueDate) }, { merge: true })
                 .then(() => close())
-                .catch(error => console.error(error))
+                .catch(error => console.error(error)) :
+                tasksRef.doc(id)
+                    .set({ dueDate: null }, { merge: true })
+                    .then(() => close())
+                    .catch(error => console.error(error))
             }>
             {({ values, setFieldValue, handleSubmit }) => (
                 <MuiPickersUtilsProvider utils={MomentUtils}>
@@ -41,6 +46,7 @@ export default function TaskDatePicker({ id, initDate, close }) {
                         }}
                     />
                     <IconButton size="small" onClick={handleSubmit}><SaveIcon /></IconButton>
+                    <IconButton size="small" onClick={() => setFieldValue('dueDate', null)}><DeleteIcon /></IconButton>
                 </MuiPickersUtilsProvider >)}
         </Formik >
     );

@@ -88,7 +88,7 @@ export default function TaskDetails({ isOpen, handleClose, id }) {
                         {task.image && <img src={task.image} className={classes.img} alt="task" onClick={handleOpenImg} />}
                         <IconButton className={classes.topRight} onClick={handleClose}><CloseIcon /></IconButton>
                         <IconButton className={classes.bottomRight} onClick={handleOpenImg} ><ImageIcon /></IconButton>
-                        <Typography className={classes.bottomLeft} variant="subtitle2">in list: To DO</Typography>
+                        {/* <Typography className={classes.bottomLeft} variant="subtitle2">in list: To DO</Typography> */}
                     </div>
                     <DialogTitle>
                         {editTitle ?

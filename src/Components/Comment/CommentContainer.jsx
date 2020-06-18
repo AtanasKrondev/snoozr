@@ -30,6 +30,6 @@ export default function CommentContainer({ task }) {
     return (<>
         <CommentForm task={task} />
         {loading ? <CircularProgress color="secondary" /> :
-            <>{comments.map(comment => <CommentCard key={comment.id} comment={comment} authorId={comment.author} />)}</>}
+            <>{comments.map(comment => <CommentCard key={comment.id} comment={comment} authorId={comment.author} task={task} />)}</>}
     </>)
 }
