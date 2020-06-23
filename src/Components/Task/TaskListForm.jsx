@@ -33,14 +33,8 @@ export default function TaskListForm({ boardId }) {
                 initialValues={{ title: '' }}
                 onSubmit={({ title }) => {
                     const author = user ? user.uid : '';
-                    const addList = listsRef.add({ title, tasks: [], author, taskCount: 0 });
-                    const lastPosition = board.set({ listCount: fieldValue.increment(1) }, { merge: true });
-                    Promise.all([addList, lastPosition])
-                        .then(
-                            ([{ id }]) => board.get()
-                                .then(board => board.data().listCount)
-                                .then(position => board.set({ lists: fieldValue.arrayUnion({ id, position }) }, { merge: true }))
-                        )
+                    listsRef.add({ title, tasks: [], author })
+                        .then(({ id }) => board.set({ lists: fieldValue.arrayUnion(id) }, { merge: true }))
                         .catch(error => console.error(error))
                 }}
                 validationSchema={title}>

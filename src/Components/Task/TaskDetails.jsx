@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Dialog from '@material-ui/core/Dialog';
 import {
-    DialogTitle, DialogContent, IconButton, CircularProgress, TextField
+    DialogTitle, DialogContent, IconButton, CircularProgress, TextField, Button
 } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
@@ -20,6 +20,7 @@ import TaskDatePicker from './TaskDatePicker';
 import moment from 'moment'
 import TaskChecklist from './TaskChecklist';
 import CommentContainer from '../Comment/CommentContainer';
+import TaskEdit from './TaskEdit';
 
 const useStyles = makeStyles(theme => ({
     cover: {
@@ -64,6 +65,9 @@ export default function TaskDetails({ isOpen, handleClose, id }) {
     const [isOpenImg, setIsOpenImg] = useState(false);
     const handleOpenImg = () => setIsOpenImg(!isOpenImg);
 
+    const [editTask, setEditTask] = useState(false);
+    const handleEditTask = () => setEditTask(!editTask);
+
     const [editTitle, setEditTitle] = useState(false);
     const handleEditTitle = () => setEditTitle(!editTitle);
 
@@ -88,7 +92,8 @@ export default function TaskDetails({ isOpen, handleClose, id }) {
                         {task.image && <img src={task.image} className={classes.img} alt="task" onClick={handleOpenImg} />}
                         <IconButton className={classes.topRight} onClick={handleClose}><CloseIcon /></IconButton>
                         <IconButton className={classes.bottomRight} onClick={handleOpenImg} ><ImageIcon /></IconButton>
-                        {/* <Typography className={classes.bottomLeft} variant="subtitle2">in list: To DO</Typography> */}
+                        <Typography className={classes.bottomLeft}>
+                            <Button variant="contained" endIcon={<EditIcon />} onClick={handleEditTask}>Edit task</Button></Typography>
                     </div>
                     <DialogTitle>
                         {editTitle ?
@@ -175,6 +180,7 @@ export default function TaskDetails({ isOpen, handleClose, id }) {
                     </DialogContent >
                 </Dialog >
                 <TaskImage isOpenImg={isOpenImg} handleCloseImg={handleOpenImg} id={id} image={task.image} />
+                <TaskEdit open={editTask} onClose={handleEditTask} id={id} list={task.list} title={task.title} />
             </>}
         </>
     )

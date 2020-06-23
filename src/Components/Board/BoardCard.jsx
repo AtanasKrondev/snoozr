@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Typography, Card, CardActionArea, makeStyles } from '@material-ui/core';
+import { Typography, Card, CardActionArea, makeStyles, CircularProgress } from '@material-ui/core';
+import { boardsRef } from '../../firebase';
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -18,17 +19,26 @@ const useStyles = makeStyles(theme => ({
     },
 }))
 
-export default function BoardCard({ boardTitle, boardId, card }) {
+export default function BoardCard({ id, card }) {
     const classes = useStyles();
+    const [board, setBoard] = useState(null)
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => boardsRef.doc(id).onSnapshot(snapshot => {
+        setLoading(true)
+        const data = snapshot.data();
+        setBoard({ id, ...data });
+        setLoading(false);
+    }, error => console.error(error)), [id])
 
     return (
         <Card raised className={card ? classes.card : classes.listItem}>
-            <CardActionArea className={classes.action} component={Link} to={`/board/${boardId}`} >
-                <Typography gutterBottom variant="h5" align="center" >
-                    {boardTitle}
-                </Typography>
-            </CardActionArea>
+            {loading ? <CircularProgress color="secondary" /> :
+                <CardActionArea className={classes.action} component={Link} to={`/board/${id}`} >
+                    <Typography gutterBottom variant="h5" align="center" >
+                        {board.title} ({board.lists && board.lists.length})
+                    </Typography>
+                </CardActionArea>}
         </Card>
-
     )
 }

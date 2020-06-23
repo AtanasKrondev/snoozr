@@ -82,8 +82,9 @@ export default function Board() {
                 </Typography>}
         </Box>
         <Container className={classes.root}>
-            {board.lists && board.lists.sort((a, b) => a.position - b.position)
-                .map(({ id }) => (<TaskList key={id} id={id}></TaskList>))}
+            {board.lists && board.lists
+                // .sort((a, b) => a.position - b.position)
+                .map(listId => (<TaskList key={listId} id={listId} boardId={id}></TaskList>))}
             < TaskListForm boardId={id} />
         </ Container></>}
     </>

@@ -10,7 +10,6 @@ import UserProvider from './providers/UserProvider'
 import Header from './Components/Core/Header'
 import Drawer from './Components/Core/Drawer'
 import AppRouter from './Components/Core/AppRouter';
-import BoardsProvider from './providers/BoardsProvider';
 
 const useStyles = makeStyles({
   '@global': {
@@ -29,18 +28,16 @@ function App() {
 
   return (
     <UserProvider>
-      <BoardsProvider>
-        <Router>
-          <CssBaseline />
-          <ThemeProvider theme={theme}>
-            <Paper>
-              <Header onClick={toggleDrawer} />
-              <Drawer open={isOpen} onClose={toggleDrawer} onOpen={toggleDrawer} />
-              <AppRouter />
-            </Paper>
-          </ThemeProvider>
-        </Router>
-      </BoardsProvider>
+      <Router>
+        <CssBaseline />
+        <ThemeProvider theme={theme}>
+          <Paper>
+            <Header onClick={toggleDrawer} />
+            <Drawer open={isOpen} onClose={toggleDrawer} onOpen={toggleDrawer} />
+            <AppRouter />
+          </Paper>
+        </ThemeProvider>
+      </Router>
     </UserProvider>
   );
 }

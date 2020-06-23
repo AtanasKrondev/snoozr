@@ -3,6 +3,7 @@ import * as Yup from 'yup';
 export const title = Yup.object().shape({
     title: Yup.string()
         .required('Enter a title')
+        .max(60, 'Title must be less than 60 symbols')
 });
 export const item = Yup.object().shape({
     item: Yup.string()

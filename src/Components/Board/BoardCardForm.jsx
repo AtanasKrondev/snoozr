@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { Card, makeStyles, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton, FormHelperText } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import { Formik } from 'formik';
-import { boardsRef } from '../../firebase'
+import { boardsRef, usersRef, fieldValue } from '../../firebase'
 import { UserContext } from '../../providers/UserProvider';
 import { title } from '../../vaildators';
 
@@ -20,10 +20,10 @@ export default function BoardCardForm({ card }) {
         <Card elevation={0} className={card && classes.card}>
             <Formik
                 initialValues={{ title: '' }}
-                onSubmit={({ title }, { resetForm }) => {
+                onSubmit={({ title }) => {
                     const author = user ? user.uid : '';
-                    boardsRef.add({ title, author, lists: [], listCount: 0 })
-                        .then(() => resetForm())
+                    boardsRef.add({ title, author, lists: [] })
+                        .then(({ id }) => usersRef.doc(author).set({ boards: fieldValue.arrayUnion(id) }, { merge: true }))
                         .catch(error => console.error(error))
                 }}
                 validationSchema={title}>
