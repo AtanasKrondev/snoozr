@@ -135,7 +135,7 @@ export default function TaskDetails({ isOpen, handleClose, id }) {
                                         {task.dueDate && moment.unix(task.dueDate.seconds).format('MMMM Do HH:mm')}
                                     </Typography>}
                             </Grid>
-                            <Grid item xs={12} sm={9}>
+                            <Grid item xs={12} md={8}>
                                 <Typography variant="body1" component="h3">Description
                                 {editDescription ?
                                         <IconButton size="small" onClick={handleEditDescription}><CloseIcon /></IconButton>
@@ -169,7 +169,7 @@ export default function TaskDetails({ isOpen, handleClose, id }) {
                                     : <Typography variant="body1" component="p">{task.description}</Typography>
                                 }
                             </Grid>
-                            <Grid item xs={12} sm={3}>
+                            <Grid item xs={12} md={4}>
                                 <TaskChecklist id={id} checklist={task.checklist} />
                             </Grid>
                             <Grid item xs={12}>

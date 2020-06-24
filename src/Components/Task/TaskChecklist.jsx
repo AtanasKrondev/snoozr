@@ -5,11 +5,13 @@ import EditIcon from '@material-ui/icons/Edit';
 import SaveIcon from '@material-ui/icons/Save';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import { Formik, FieldArray } from 'formik';
 import { tasksRef, fieldValue } from '../../firebase';
 import { item, checklist as checklistSchema } from '../../vaildators';
 
-const useStyles = makeStyles({ checklistAdd: { display: 'flex' }, })
+const useStyles = makeStyles({ checklistAdd: { display: 'flex' }, row: { display: 'flex' } })
 
 export default function TaskChecklist({ checklist, id }) {
     const classes = useStyles();
@@ -21,7 +23,6 @@ export default function TaskChecklist({ checklist, id }) {
 
     return (<>
         <FormControl>
-
             <Formik
                 initialValues={{ checklist }}
                 validationSchema={checklistSchema}
@@ -44,29 +45,39 @@ export default function TaskChecklist({ checklist, id }) {
                             name="checklist"
                             render={arrayHelpers => (<>
                                 {values.checklist && values.checklist.length > 0 &&
-                                    values.checklist.map(({ item, checked }, index) => (<FormControlLabel
-                                        key={index}
-                                        name={`checklist.${index}`}
-                                        checked={checked}
-                                        disabled={editChecklist}
-                                        control={<Checkbox
-                                        />}
-                                        label={editChecklist ?
-                                            <form className={classes.checklistAdd} >
-                                                <TextField
-                                                    id={`checklist.${index}.item`}
-                                                    error={errors.checklist && !!errors.checklist[index]}
-                                                    helperText={errors.checklist && errors.checklist[index] && errors.checklist[index].item}
-                                                    {...getFieldProps(`checklist.${index}.item`)}
-                                                />
-                                                <IconButton onClick={() => { arrayHelpers.remove(index) }}><DeleteIcon /></IconButton>
-                                            </form>
-                                            : item}
-                                        onChange={() => {
-                                            arrayHelpers.replace(index, { item, checked: !checked })
-                                            handleSubmit()
-                                        }}
-                                    />))}
+                                    values.checklist.map(({ item, checked }, index) => (
+                                        <span className={classes.row} key={index}>
+                                            <FormControlLabel
+                                                name={`checklist.${index}`}
+                                                checked={checked}
+                                                disabled={editChecklist}
+                                                control={<Checkbox
+                                                />}
+                                                label={editChecklist ?
+                                                    <form className={classes.checklistAdd} >
+                                                        <IconButton
+                                                            disabled={index === 0}
+                                                            onClick={() => (index !== 0) && arrayHelpers.swap(index, index - 1)}
+                                                            size="small"><KeyboardArrowUpIcon /></IconButton>
+                                                        <IconButton
+                                                            disabled={index === values.checklist.length - 1}
+                                                            onClick={() => (index !== values.checklist.length - 1) && arrayHelpers.swap(index, index + 1)}
+                                                            size="small"><KeyboardArrowDownIcon /></IconButton>
+                                                        <TextField
+                                                            id={`checklist.${index}.item`}
+                                                            error={errors.checklist && !!errors.checklist[index]}
+                                                            helperText={errors.checklist && errors.checklist[index] && errors.checklist[index].item}
+                                                            {...getFieldProps(`checklist.${index}.item`)}
+                                                        />
+                                                        <IconButton size="small" onClick={() => { arrayHelpers.remove(index) }}><DeleteIcon /></IconButton>
+                                                    </form>
+                                                    : item}
+                                                onChange={() => {
+                                                    arrayHelpers.replace(index, { item, checked: !checked })
+                                                    handleSubmit()
+                                                }}
+                                            />
+                                        </span>))}
                             </>)} />
                     </FormGroup>
                 </>}
