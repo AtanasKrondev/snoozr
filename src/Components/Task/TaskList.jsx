@@ -4,13 +4,15 @@ import TaskCard from './TaskCard'
 import TaskCardForm from './TaskCardForm'
 import { Typography, Paper, CircularProgress, TextField, IconButton, Menu, MenuItem, ListItemText, ListItemIcon, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@material-ui/core';
 import { listsRef, boardsRef, fieldValue } from '../../firebase';
-import { Formik } from 'formik';
+import { Formik, FieldArray } from 'formik';
 import { title } from '../../vaildators';
 import EditIcon from '@material-ui/icons/Edit';
 import CloseIcon from '@material-ui/icons/Close';
 import SaveIcon from '@material-ui/icons/Save';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import DeleteIcon from '@material-ui/icons/Delete';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 
 const useStyles = makeStyles((theme) => ({
     list: {
@@ -37,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
 
 
 
-export default function TaskList({ id, boardId }) {
+export default function TaskList({ id, boardId, children }) {
     const classes = useStyles();
     const [list, setList] = useState(null);
     const [loading, setLoading] = useState(true)
@@ -106,6 +108,7 @@ export default function TaskList({ id, boardId }) {
                                     <ListItemIcon><EditIcon /></ListItemIcon>
                                     <ListItemText primary="Edit" />
                                 </MenuItem>
+                                {children}
                                 {list && list.tasks && !list.tasks.length &&
                                     (<MenuItem onClick={handleDeleteDialog}>
                                         <ListItemIcon><DeleteIcon /></ListItemIcon>
@@ -114,8 +117,26 @@ export default function TaskList({ id, boardId }) {
                             </Menu>
                         </Typography>
                     }
-                    {list.tasks && list.tasks
-                        .map(taskId => <TaskCard key={taskId} id={taskId} />)}
+                    <Formik initialValues={{ tasks: list.tasks || [] }}
+                        onSubmit={({ tasks }) => listsRef.doc(id)
+                            .set({ tasks }, { merge: true }).catch(error => console.log(error))
+                        }>
+                        {({ values, handleSubmit }) => <FieldArray name="tasks"
+                            render={arrayHelpers => (<>
+                                {values.tasks && values.tasks
+                                    .map((taskId, index) => <div key={taskId}>
+                                        <TaskCard id={taskId}>
+                                            <IconButton
+                                                disabled={index === 0}
+                                                onClick={() => { if (index !== 0) { arrayHelpers.swap(index, index - 1); handleSubmit() } }}
+                                                size="small"><KeyboardArrowUpIcon /></IconButton>
+                                            <IconButton
+                                                disabled={values.tasks && index === values.tasks.length - 1}
+                                                onClick={() => { if (index !== values.tasks.length - 1) { arrayHelpers.swap(index, index + 1); handleSubmit() } }}
+                                                size="small"><KeyboardArrowDownIcon /></IconButton>
+                                        </TaskCard></div>)}
+                            </>)} />}
+                    </Formik>
                     <TaskCardForm listId={list && list.id} /></>}
             </Paper >
             <Dialog open={deleteDialog} onClose={handleDeleteDialog}>

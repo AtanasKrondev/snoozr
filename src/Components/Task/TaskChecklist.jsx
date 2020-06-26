@@ -7,6 +7,7 @@ import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+import ReplayIcon from '@material-ui/icons/Replay';
 import { Formik, FieldArray } from 'formik';
 import { tasksRef, fieldValue } from '../../firebase';
 import { item, checklist as checklistSchema } from '../../vaildators';
@@ -104,7 +105,7 @@ export default function TaskChecklist({ checklist, id }) {
                         <AddIcon />
                     </IconButton>
                     <IconButton size="small" onClick={resetForm}>
-                        <CloseIcon />
+                        <ReplayIcon />
                     </IconButton>
                 </form>)}
         </Formik>

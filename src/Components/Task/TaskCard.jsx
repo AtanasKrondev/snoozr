@@ -34,7 +34,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-export default function TaskCard({ id }) {
+export default function TaskCard({ id, children }) {
     const classes = useStyles();
     const [isOpen, setIsOpen] = useState(false);
     const handleOpen = () => setIsOpen(true);
@@ -53,18 +53,21 @@ export default function TaskCard({ id }) {
         <>
             <Card raised className={classes.root}>
                 {loading ? <CircularProgress color="secondary" />
-                    : <CardActionArea onClick={handleOpen}>
-                        {task.image && <CardMedia
-                            className={classes.media}
-                            image={task.image}
-                            title={task.title}
-                        />}
-                        <CardContent className={classes.content}>
-                            <Typography variant="body2" component="p">
-                                {task.title}
-                            </Typography>
-                        </CardContent>
-                        <CardActions className={classes.actions}>
+                    : <>
+                        <CardActionArea onClick={handleOpen}>
+                            {task.image && <CardMedia
+                                className={classes.media}
+                                image={task.image}
+                                title={task.title}
+                            />}
+                            <CardContent className={classes.content}>
+                                <Typography variant="body2" component="p">
+                                    {task.title}
+                                </Typography>
+                            </CardContent>
+                        </CardActionArea>
+                        <CardActions className={classes.actions} disableSpacing >
+                            {children}
                             {task.description && <SubjectIcon fontSize="small" />}
                             {task.comments && task.comments.length > 0 && <>
                                 <CommentIcon fontSize="small" />
@@ -77,8 +80,7 @@ export default function TaskCard({ id }) {
                                 <ScheduleIcon fontSize="small" />
                                 {moment.unix(task.dueDate.seconds).format('MMM D')}
                             </>}
-                        </CardActions>
-                    </CardActionArea>}
+                        </CardActions></>}
             </Card >
             <TaskDetails isOpen={isOpen} handleClose={handleClose} id={id} />
         </>

@@ -10,10 +10,12 @@ import EditIcon from '@material-ui/icons/Edit';
 import CloseIcon from '@material-ui/icons/Close';
 import SaveIcon from '@material-ui/icons/Save';
 import { title } from '../../vaildators';
-import { Formik } from 'formik';
+import { Formik, FieldArray } from 'formik';
 import { UserContext } from '../../providers/UserProvider';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import DeleteIcon from '@material-ui/icons/Delete';
+import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -118,8 +120,31 @@ export default function Board() {
                 </Typography>}
         </Box>
         <Container className={classes.root}>
-            {board.lists && board.lists
-                .map(listId => (<TaskList key={listId} id={listId} boardId={id}></TaskList>))}
+            <Formik initialValues={{ lists: board.lists || [] }}
+                onSubmit={({ lists }) => boardsRef.doc(id)
+                    .set({ lists }, { merge: true }).catch(error => console.log(error))}>
+                {({ values, handleSubmit }) => <FieldArray name="lists"
+                    render={arrayHelpers => (<>
+                        {values.lists && values.lists
+                            .map((listId, index) => (<TaskList key={listId} id={listId} boardId={id}>
+                                <MenuItem
+                                    disabled={index === 0}
+                                    onClick={() => { if (index !== 0) { arrayHelpers.swap(index, index - 1); handleSubmit() } }}
+                                >
+                                    <ListItemIcon><KeyboardArrowLeftIcon /></ListItemIcon>
+                                    <ListItemText primary="Move Left" />
+                                </MenuItem>
+                                <MenuItem
+                                    disabled={values.lists && index === values.lists.length - 1}
+                                    onClick={() => { if (index !== values.lists.length - 1) { arrayHelpers.swap(index, index + 1); handleSubmit() } }}
+                                >
+                                    <ListItemIcon><KeyboardArrowRightIcon /></ListItemIcon>
+                                    <ListItemText primary="Move Right" />
+                                </MenuItem>
+                            </TaskList>))}
+                    </>)}
+                />}
+            </Formik>
             < TaskListForm boardId={id} />
         </ Container></>}
         <Dialog open={deleteDialog} onClose={handleDeleteDialog}>
