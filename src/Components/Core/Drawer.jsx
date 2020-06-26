@@ -22,10 +22,12 @@ export default function Drawer({ open, onClose, onOpen }) {
         const uid = user ? user.uid : '';
         if (uid) {
             const cleanUp = usersRef.doc(uid).onSnapshot(snapshot => {
-                setLoading(true)
-                const data = snapshot.data();
-                setBoards(data.boards);
-                setLoading(false);
+                if (snapshot.exists) {
+                    setLoading(true)
+                    const data = snapshot.data();
+                    setBoards(data.boards);
+                    setLoading(false);
+                }
             }, error => console.error(error))
             return () => cleanUp();
         }

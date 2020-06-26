@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import TaskCard from './TaskCard'
 import TaskCardForm from './TaskCardForm'
 import { Typography, Paper, CircularProgress, TextField, IconButton, Menu, MenuItem, ListItemText, ListItemIcon, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@material-ui/core';
-import { listsRef, boardsRef, fieldValue } from '../../firebase';
+import { listsRef, boardsRef, fieldValue, tasksRef } from '../../firebase';
 import { Formik, FieldArray } from 'formik';
 import { title } from '../../vaildators';
 import EditIcon from '@material-ui/icons/Edit';
@@ -146,6 +146,9 @@ export default function TaskList({ id, boardId, children, prevId, nextId }) {
                                                     if (prevId) {
                                                         listsRef.doc(prevId)
                                                             .set({ tasks: fieldValue.arrayUnion(taskId) }, { merge: true })
+                                                            .then(() => tasksRef.doc(taskId).set({ list: prevId }, { merge: true })
+                                                                .catch(error => console.log(error))
+                                                            )
                                                             .catch(error => console.log(error));
                                                         arrayHelpers.remove(index);
                                                         handleSubmit();
@@ -159,6 +162,9 @@ export default function TaskList({ id, boardId, children, prevId, nextId }) {
                                                     if (nextId) {
                                                         listsRef.doc(nextId)
                                                             .set({ tasks: fieldValue.arrayUnion(taskId) }, { merge: true })
+                                                            .then(() => tasksRef.doc(taskId).set({ list: nextId }, { merge: true })
+                                                                .catch(error => console.log(error))
+                                                            )
                                                             .catch(error => console.log(error));
                                                         arrayHelpers.remove(index);
                                                         handleSubmit();

@@ -37,10 +37,12 @@ export default function Home() {
     useEffect(() => {
         const uid = user ? user.uid : '';
         const cleanUp = uid && usersRef.doc(uid).onSnapshot(snapshot => {
-            setLoading(true)
-            const data = snapshot.data();
-            setBoards(data.boards);
-            setLoading(false);
+            if (snapshot.exists) {
+                setLoading(true)
+                const data = snapshot.data();
+                setBoards(data.boards);
+                setLoading(false);
+            }
         }, error => console.error(error))
         return () => cleanUp();
     }, [user])

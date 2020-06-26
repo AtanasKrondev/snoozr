@@ -33,14 +33,6 @@ export default function TaskCardForm({ listId }) {
                     tasksRef.add({ title, author, list: listId })
                         .then(({ id }) => list.set({ tasks: fieldValue.arrayUnion(id) }, { merge: true }))
                         .catch(error => console.log(error))
-                    // const lastPosition = list.set({ taskCount: fieldValue.increment(1) }, { merge: true });
-                    // Promise.all([addTask, lastPosition])
-                    //     .then(
-                    //         ([{ id }]) => list.get()
-                    //             .then(list => list.data().taskCount)
-                    //             .then(position => list.set({ tasks: fieldValue.arrayUnion({ id, position }) }, { merge: true }))
-                    //     )
-                    //     .catch(error => console.error(error))
                 }}
                 validationSchema={title}>
                 {({ touched, errors, getFieldProps, handleSubmit }) => (

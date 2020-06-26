@@ -65,7 +65,10 @@ export default function SignUp() {
         initialValues={{ displayName: '', photoURL: '', email: '', password: '', rePassword: '' }}
         onSubmit={({ displayName, photoURL, email, password }) => {
           auth.createUserWithEmailAndPassword(email, password)
-            .then(({ user }) => usersRef.doc(user.uid).set({ displayName, photoURL }))
+            .then(({ user }) => {
+              usersRef.doc(user.uid).set({ displayName, photoURL })
+                .catch(error => console.error(error))
+            })
             .then(() => auth.currentUser.updateProfile({ displayName, photoURL }))
             .then(() => history.push('/profile'))
             .catch(error => console.error(error))
