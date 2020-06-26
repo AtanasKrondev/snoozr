@@ -13,6 +13,8 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import DeleteIcon from '@material-ui/icons/Delete';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 
 const useStyles = makeStyles((theme) => ({
     list: {
@@ -35,11 +37,12 @@ const useStyles = makeStyles((theme) => ({
             borderRadius: '0.8em'
         }
     },
+    button: { padding: 0 }
 }));
 
 
 
-export default function TaskList({ id, boardId, children }) {
+export default function TaskList({ id, boardId, children, prevId, nextId }) {
     const classes = useStyles();
     const [list, setList] = useState(null);
     const [loading, setLoading] = useState(true)
@@ -127,13 +130,41 @@ export default function TaskList({ id, boardId, children }) {
                                     .map((taskId, index) => <div key={taskId}>
                                         <TaskCard id={taskId}>
                                             <IconButton
+                                                className={classes.button}
                                                 disabled={index === 0}
                                                 onClick={() => { if (index !== 0) { arrayHelpers.swap(index, index - 1); handleSubmit() } }}
                                                 size="small"><KeyboardArrowUpIcon /></IconButton>
                                             <IconButton
+                                                className={classes.button}
                                                 disabled={values.tasks && index === values.tasks.length - 1}
                                                 onClick={() => { if (index !== values.tasks.length - 1) { arrayHelpers.swap(index, index + 1); handleSubmit() } }}
                                                 size="small"><KeyboardArrowDownIcon /></IconButton>
+                                            <IconButton
+                                                className={classes.button}
+                                                disabled={!prevId}
+                                                onClick={() => {
+                                                    if (prevId) {
+                                                        listsRef.doc(prevId)
+                                                            .set({ tasks: fieldValue.arrayUnion(taskId) }, { merge: true })
+                                                            .catch(error => console.log(error));
+                                                        arrayHelpers.remove(index);
+                                                        handleSubmit();
+                                                    }
+                                                }}
+                                                size="small"><KeyboardArrowLeftIcon /></IconButton>
+                                            <IconButton
+                                                className={classes.button}
+                                                disabled={!nextId}
+                                                onClick={() => {
+                                                    if (nextId) {
+                                                        listsRef.doc(nextId)
+                                                            .set({ tasks: fieldValue.arrayUnion(taskId) }, { merge: true })
+                                                            .catch(error => console.log(error));
+                                                        arrayHelpers.remove(index);
+                                                        handleSubmit();
+                                                    }
+                                                }}
+                                                size="small"><KeyboardArrowRightIcon /></IconButton>
                                         </TaskCard></div>)}
                             </>)} />}
                     </Formik>

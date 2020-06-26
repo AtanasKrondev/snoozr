@@ -126,22 +126,25 @@ export default function Board() {
                 {({ values, handleSubmit }) => <FieldArray name="lists"
                     render={arrayHelpers => (<>
                         {values.lists && values.lists
-                            .map((listId, index) => (<TaskList key={listId} id={listId} boardId={id}>
-                                <MenuItem
-                                    disabled={index === 0}
-                                    onClick={() => { if (index !== 0) { arrayHelpers.swap(index, index - 1); handleSubmit() } }}
-                                >
-                                    <ListItemIcon><KeyboardArrowLeftIcon /></ListItemIcon>
-                                    <ListItemText primary="Move Left" />
-                                </MenuItem>
-                                <MenuItem
-                                    disabled={values.lists && index === values.lists.length - 1}
-                                    onClick={() => { if (index !== values.lists.length - 1) { arrayHelpers.swap(index, index + 1); handleSubmit() } }}
-                                >
-                                    <ListItemIcon><KeyboardArrowRightIcon /></ListItemIcon>
-                                    <ListItemText primary="Move Right" />
-                                </MenuItem>
-                            </TaskList>))}
+                            .map((listId, index) => (
+                                <TaskList
+                                    key={listId} id={listId} boardId={id}
+                                    prevId={values.lists[index - 1]} nextId={values.lists[index + 1]}>
+                                    <MenuItem
+                                        disabled={index === 0}
+                                        onClick={() => { if (index !== 0) { arrayHelpers.swap(index, index - 1); handleSubmit() } }}
+                                    >
+                                        <ListItemIcon><KeyboardArrowLeftIcon /></ListItemIcon>
+                                        <ListItemText primary="Move Left" />
+                                    </MenuItem>
+                                    <MenuItem
+                                        disabled={values.lists && index === values.lists.length - 1}
+                                        onClick={() => { if (index !== values.lists.length - 1) { arrayHelpers.swap(index, index + 1); handleSubmit() } }}
+                                    >
+                                        <ListItemIcon><KeyboardArrowRightIcon /></ListItemIcon>
+                                        <ListItemText primary="Move Right" />
+                                    </MenuItem>
+                                </TaskList>))}
                     </>)}
                 />}
             </Formik>
