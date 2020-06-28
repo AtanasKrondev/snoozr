@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import Dialog from '@material-ui/core/Dialog';
 import { IconButton, FormControl, InputLabel, InputAdornment, OutlinedInput, FormHelperText } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
@@ -8,6 +8,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import { Formik } from 'formik';
 import { imageURL } from '../../vaildators';
 import { tasksRef } from '../../firebase';
+import { NotificationsContext } from '../../providers/NotificationsProvider';
 
 const useStyles = makeStyles(theme => ({
     cover: {
@@ -44,6 +45,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function TaskDetails({ isOpenImg, handleCloseImg, image, id }) {
     const classes = useStyles();
+    const { showMessage } = useContext(NotificationsContext)
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
     const task = tasksRef.doc(id);
@@ -58,17 +60,18 @@ export default function TaskDetails({ isOpenImg, handleCloseImg, image, id }) {
                 initialValues={{ image: image || '' }}
                 onSubmit={({ image }) => {
                     task.set({ image }, { merge: true })
-                        .catch(error => console.error(error))
+                        .catch(error => { console.log(error); showMessage(error.message, 'error') })
                 }}
                 validationSchema={imageURL}
             >
-                {({ touched, errors, getFieldProps, handleSubmit }) => (
+                {({ touched, errors, getFieldProps, handleSubmit, isValid, dirty }) => (
                     <FormControl fullWidth className={classes.form} error={touched.image && !!errors.image}>
                         <InputLabel htmlFor={`image${id}`} variant="filled">Upload Image</InputLabel>
                         <OutlinedInput id={`image${id}`} type="text" fullWidth {...getFieldProps('image')}
                             endAdornment={
                                 <InputAdornment position="end">
-                                    <IconButton onClick={handleSubmit}><PublishIcon /></IconButton>
+                                    <IconButton disabled={!isValid || !dirty}
+                                        onClick={handleSubmit}><PublishIcon /></IconButton>
                                 </InputAdornment>
                             } />
                         <FormHelperText>{errors.image}</FormHelperText>

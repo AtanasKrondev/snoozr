@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import TaskCard from './TaskCard'
 import TaskCardForm from './TaskCardForm'
@@ -15,6 +15,7 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
+import { NotificationsContext } from '../../providers/NotificationsProvider';
 
 const useStyles = makeStyles((theme) => ({
     list: {
@@ -44,6 +45,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function TaskList({ id, boardId, children, prevId, nextId }) {
     const classes = useStyles();
+    const { showMessage } = useContext(NotificationsContext)
     const [list, setList] = useState(null);
     const [loading, setLoading] = useState(true)
 
@@ -59,14 +61,15 @@ export default function TaskList({ id, boardId, children, prevId, nextId }) {
         const data = snapshot.data();
         setList({ id, ...data });
         setLoading(false);
-    }, error => console.error(error)), [id])
+    }, error => { console.log(error); showMessage(error.message, 'error') }), [id, showMessage])
 
     const deleteList = () => {
         if (!list.tasks.length) {
             listsRef.doc(id).delete()
-                .catch(error => console.error(error))
+                .then(() => showMessage('List deleted', 'info'))
+                .catch(error => { console.log(error); showMessage(error.message, 'error') })
             boardsRef.doc(boardId).set({ lists: fieldValue.arrayRemove(id) }, { merge: true })
-                .catch(error => console.error(error))
+                .catch(error => { console.log(error); showMessage(error.message, 'error') })
         }
     };
 
@@ -84,10 +87,10 @@ export default function TaskList({ id, boardId, children, prevId, nextId }) {
                             onSubmit={({ title }) => {
                                 listsRef.doc(id).set({ title }, { merge: true })
                                     .then(() => handleEditTitle())
-                                    .catch(error => console.log(error))
+                                    .catch(error => { console.log(error); showMessage(error.message, 'error') })
                             }}
                             validationSchema={title}>
-                            {({ touched, errors, getFieldProps, handleSubmit }) => (
+                            {({ touched, errors, getFieldProps, handleSubmit, dirty, isValid }) => (
                                 <form onSubmit={handleSubmit}>
                                     <TextField
                                         id="listTitle"
@@ -95,7 +98,7 @@ export default function TaskList({ id, boardId, children, prevId, nextId }) {
                                         helperText={errors.title}
                                         {...getFieldProps('title')}
                                     />
-                                    <IconButton size="small" type="submit"><SaveIcon /></IconButton>
+                                    <IconButton size="small" type="submit" disabled={!isValid || !dirty}><SaveIcon /></IconButton>
                                     <IconButton size="small" onClick={handleEditTitle}><CloseIcon /></IconButton>
                                 </form>)}
                         </Formik> :

@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { Typography, Card, CardActionArea, makeStyles, CircularProgress } from '@material-ui/core';
 import { boardsRef } from '../../firebase';
+import { NotificationsContext } from '../../providers/NotificationsProvider';
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -23,13 +24,14 @@ export default function BoardCard({ id, card }) {
     const classes = useStyles();
     const [board, setBoard] = useState(null)
     const [loading, setLoading] = useState(true)
+    const { showMessage } = useContext(NotificationsContext);
 
     useEffect(() => boardsRef.doc(id).onSnapshot(snapshot => {
         setLoading(true)
         const data = snapshot.data();
         setBoard({ id, ...data });
         setLoading(false);
-    }, error => console.error(error)), [id])
+    }, error => { console.log(error); showMessage(error.message, 'error') }), [id, showMessage])
 
     return (
         <Card raised className={card ? classes.card : classes.listItem}>

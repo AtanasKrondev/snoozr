@@ -7,6 +7,7 @@ import BoardCardForm from './Board/BoardCardForm'
 import { UserContext } from '../providers/UserProvider';
 import { useEffect } from 'react';
 import { usersRef } from '../firebase';
+import { NotificationsContext } from '../providers/NotificationsProvider';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -34,6 +35,8 @@ export default function Home() {
     const [boards, setBoards] = useState(null)
     const [loading, setLoading] = useState(false)
     const { user } = useContext(UserContext)
+    const { showMessage } = useContext(NotificationsContext)
+
     useEffect(() => {
         const uid = user ? user.uid : '';
         const cleanUp = uid && usersRef.doc(uid).onSnapshot(snapshot => {
@@ -43,9 +46,9 @@ export default function Home() {
                 setBoards(data.boards);
                 setLoading(false);
             }
-        }, error => console.error(error))
+        }, error => { console.log(error); showMessage('Something went wrong!', 'warning') })
         return () => cleanUp();
-    }, [user])
+    }, [user,showMessage])
 
     return (<>{
         loading ? <LinearProgress color="secondary" /> :

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Dialog from '@material-ui/core/Dialog';
 import {
     DialogTitle, DialogContent, IconButton, CircularProgress, TextField, Button
@@ -58,6 +58,7 @@ const useStyles = makeStyles(theme => ({
 export default function TaskDetails({ isOpen, handleClose, id }) {
     const classes = useStyles();
     const theme = useTheme();
+    const { showMessage } = useContext
     const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
     const [task, setTask] = useState(null);
     const [loading, setLoading] = useState(true)
@@ -82,7 +83,7 @@ export default function TaskDetails({ isOpen, handleClose, id }) {
         const data = snapshot.data();
         setTask({ id, ...data });
         setLoading(false);
-    }, error => console.error(error)), [id])
+    }, error => { console.log(error); showMessage(error.message, 'error') }), [id, showMessage])
 
     return (
         <>

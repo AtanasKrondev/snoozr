@@ -9,6 +9,7 @@ import { title } from '../../vaildators'
 import { listsRef, tasksRef, fieldValue } from '../../firebase';
 import { useContext } from 'react';
 import { UserContext } from '../../providers/UserProvider';
+import { NotificationsContext } from '../../providers/NotificationsProvider';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -22,7 +23,8 @@ const useStyles = makeStyles(theme => ({
 export default function TaskCardForm({ listId }) {
     const classes = useStyles();
     const list = listsRef.doc(listId);
-    const { user } = useContext(UserContext)
+    const { user } = useContext(UserContext);
+    const { showMessage } = useContext(NotificationsContext);
 
     return (
         <Card raised className={classes.root} >
@@ -32,17 +34,17 @@ export default function TaskCardForm({ listId }) {
                     const author = user ? user.uid : '';
                     tasksRef.add({ title, author, list: listId })
                         .then(({ id }) => list.set({ tasks: fieldValue.arrayUnion(id) }, { merge: true }))
-                        .catch(error => console.log(error))
+                        .catch(error => { console.log(error); showMessage(error.message, 'error') })
                 }}
                 validationSchema={title}>
-                {({ touched, errors, getFieldProps, handleSubmit }) => (
+                {({ touched, errors, getFieldProps, handleSubmit, isValid, dirty }) => (
                     <FormControl fullWidth error={touched.title && !!errors.title} >
                         <InputLabel htmlFor={`title${listId}`} variant="filled">Add Task</InputLabel>
                         <OutlinedInput id={`title${listId}`} type="text" className={classes.input}
                             {...getFieldProps('title')}
                             endAdornment={
                                 <InputAdornment position="end">
-                                    <IconButton onClick={handleSubmit}><AddIcon /></IconButton>
+                                    <IconButton disabled={!isValid || !dirty} onClick={handleSubmit}><AddIcon /></IconButton>
                                 </InputAdornment>
                             }
                         />

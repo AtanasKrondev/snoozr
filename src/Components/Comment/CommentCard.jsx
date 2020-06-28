@@ -11,6 +11,7 @@ import moment from 'moment';
 import { usersRef, commentsRef, tasksRef, fieldValue } from '../../firebase';
 import { CircularProgress, Dialog, DialogContent, DialogContentText, DialogTitle, DialogActions, Button } from '@material-ui/core';
 import { UserContext } from '../../providers/UserProvider';
+import { NotificationsContext } from '../../providers/NotificationsProvider';
 
 
 const useStyles = makeStyles(theme => ({
@@ -24,7 +25,9 @@ const useStyles = makeStyles(theme => ({
 
 export default function CommentCard({ comment, authorId, task }) {
     const classes = useStyles();
-    const { user } = useContext(UserContext)
+    const { user } = useContext(UserContext);
+    const { showMessage } = useContext(NotificationsContext);
+
     const [author, setAuthor] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -38,13 +41,16 @@ export default function CommentCard({ comment, authorId, task }) {
             const id = snapshot.id;
             setAuthor({ id, ...data });
             setLoading(false);
-        }, error => console.error(error))
+        }, error => { console.log(error); showMessage(error.message, 'error') })
         return () => cleanUp()
-    }, [authorId])
+    }, [authorId, showMessage])
 
     const deleteComment = () => {
-        tasksRef.doc(task).set({ comments: fieldValue.arrayRemove(comment.id) }, { merge: true }).catch(error => console.log(error))
-        commentsRef.doc(comment.id).delete().catch(error => console.log(error))
+        tasksRef.doc(task).set({ comments: fieldValue.arrayRemove(comment.id) }, { merge: true })
+            .catch(error => { console.log(error); showMessage(error.message, 'error') })
+        commentsRef.doc(comment.id).delete()
+            .then(() => showMessage('Comment deleted', 'info'))
+            .catch(error => { console.log(error); showMessage(error.message, 'error') })
     }
 
     return (

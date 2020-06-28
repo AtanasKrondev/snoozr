@@ -1,14 +1,17 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { Dialog, DialogActions, Button, DialogTitle, DialogContent, DialogContentText } from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete';
 import { tasksRef, listsRef, fieldValue } from '../../firebase';
+import { NotificationsContext } from '../../providers/NotificationsProvider';
 
 export default function TaskEdit({ id, open, onClose, list, title }) {
+    const { showMessage } = useContext(NotificationsContext)
     const deleteTask = () => {
-        listsRef.doc(list).set({ tasks: fieldValue.arrayRemove(id) }, { merge: true })
-            .catch(error => console.error(error))
+        list && listsRef.doc(list).set({ tasks: fieldValue.arrayRemove(id) }, { merge: true })
+            .catch(error => { console.log(error); showMessage(error.message, 'error') })
         tasksRef.doc(id).delete()
-            .catch(error => console.error(error))
+            .then(() => showMessage('Task deleted', 'info'))
+            .catch(error => { console.log(error); showMessage(error.message, 'error') })
     };
 
     const [deleteDialog, setDeleteDialog] = useState(false);

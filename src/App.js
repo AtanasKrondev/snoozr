@@ -10,6 +10,8 @@ import UserProvider from './providers/UserProvider'
 import Header from './Components/Core/Header'
 import Drawer from './Components/Core/Drawer'
 import AppRouter from './Components/Core/AppRouter';
+import Notifications from './Components/Core/Notifications';
+import NotificationsProvider from './providers/NotificationsProvider';
 
 const useStyles = makeStyles({
   '@global': {
@@ -31,11 +33,14 @@ function App() {
       <Router>
         <CssBaseline />
         <ThemeProvider theme={theme}>
-          <Paper>
-            <Header onClick={toggleDrawer} />
-            <Drawer open={isOpen} onClose={toggleDrawer} onOpen={toggleDrawer} />
-            <AppRouter />
-          </Paper>
+          <NotificationsProvider>
+            <Paper>
+              <Header onClick={toggleDrawer} />
+              <Drawer open={isOpen} onClose={toggleDrawer} onOpen={toggleDrawer} />
+              <AppRouter />
+            </Paper>
+            <Notifications />
+          </NotificationsProvider>
         </ThemeProvider>
       </Router>
     </UserProvider>

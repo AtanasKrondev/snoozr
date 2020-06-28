@@ -8,6 +8,7 @@ import { UserContext } from '../../providers/UserProvider';
 import { Formik } from 'formik';
 import { comment as commentSchema } from '../../vaildators';
 import { commentsRef, fieldValue, tasksRef } from '../../firebase';
+import { NotificationsContext } from '../../providers/NotificationsProvider';
 
 const useStyles = makeStyles(theme => ({
     form: {
@@ -21,7 +22,8 @@ const useStyles = makeStyles(theme => ({
 
 export default function CommentForm({ task }) {
     const classes = useStyles();
-    const { user } = useContext(UserContext)
+    const { user } = useContext(UserContext);
+    const { showMessage } = useContext(NotificationsContext);
 
     return (
         <div className={classes.form} >
@@ -38,9 +40,9 @@ export default function CommentForm({ task }) {
                             tasksRef.doc(task).set({ comments: fieldValue.arrayUnion(id) }, { merge: true })
                             resetForm()
                         })
-                        .catch(error => console.error(error))
+                        .catch(error => { console.log(error); showMessage(error.message, 'error') })
                 }}>
-                {({ touched, errors, getFieldProps, handleSubmit }) => (
+                {({ touched, errors, getFieldProps, handleSubmit, isValid, dirty }) => (
                     <FormControl fullWidth>
                         <TextField
                             fullWidth
@@ -54,7 +56,8 @@ export default function CommentForm({ task }) {
                             {...getFieldProps('comment')}
                         />
                         <Grid container alignItems="flex-start" justify="flex-end" direction="row">
-                            <Button onClick={handleSubmit} endIcon={<SendIcon />} color="primary">Send</Button>
+                            <Button onClick={handleSubmit} disabled={!isValid || !dirty}
+                                endIcon={<SendIcon />} color="primary">Send</Button>
                         </Grid>
                     </FormControl>
                 )}

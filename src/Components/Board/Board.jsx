@@ -16,6 +16,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import DeleteIcon from '@material-ui/icons/Delete';
 import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
+import { NotificationsContext } from '../../providers/NotificationsProvider';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -49,15 +50,19 @@ export default function Board() {
     const history = useHistory();
     const [editTitle, setEditTitle] = useState(false);
     const handleEditTitle = () => setEditTitle(!editTitle);
-    const { user } = useContext(UserContext)
+    const { user } = useContext(UserContext);
+    const { showMessage } = useContext(NotificationsContext);
 
     const deleteBoard = () => {
         if (!board.lists.length) {
             boardsRef.doc(id).delete()
-                .then(() => history.push('/home'))
-                .catch(error => console.error(error))
+                .then(() => {
+                    showMessage('Board deleted', 'info')
+                    history.push('/home')
+                })
+                .catch(error => { console.log(error); showMessage(error.message, 'error') })
             usersRef.doc(user.uid).set({ boards: fieldValue.arrayRemove(id) }, { merge: true })
-                .catch(error => console.error(error))
+                .catch(error => { console.log(error); showMessage(error.message, 'error') })
         }
     };
 
@@ -75,7 +80,7 @@ export default function Board() {
             setBoard({ id, ...data });
             setLoading(false);
         } else history.push('/404')
-    }, error => console.error(error)), [id, history])
+    }, error => { console.log(error); showMessage(error.message, 'error') }), [id, history, showMessage])
 
     return (<>{loading ? <LinearProgress color="secondary" /> : <>
         <Box className={classes.title}>
@@ -88,7 +93,7 @@ export default function Board() {
                             .catch(error => console.log(error))
                     }}
                     validationSchema={title}>
-                    {({ touched, errors, getFieldProps, handleSubmit }) => (
+                    {({ touched, errors, getFieldProps, handleSubmit, isValid, dirty }) => (
                         <form onSubmit={handleSubmit}>
                             <TextField
                                 id="boardTitle"
@@ -96,7 +101,8 @@ export default function Board() {
                                 helperText={errors.title}
                                 {...getFieldProps('title')}
                             />
-                            <IconButton size="small" type="submit"><SaveIcon /></IconButton>
+                            <IconButton size="small" disabled={!dirty || !isValid}
+                                type="submit"><SaveIcon /></IconButton>
                             <IconButton size="small" onClick={handleEditTitle}><CloseIcon /></IconButton>
                         </form>)}
                 </Formik> :

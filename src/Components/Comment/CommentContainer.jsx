@@ -1,14 +1,14 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import CommentForm from './CommentForm';
 import CommentCard from './CommentCard';
-import { useState } from 'react';
-import { useEffect } from 'react';
 import { commentsRef } from '../../firebase';
 import { CircularProgress } from '@material-ui/core';
+import { NotificationsContext } from '../../providers/NotificationsProvider';
 
 export default function CommentContainer({ task }) {
     const [comments, setComments] = useState(null);
     const [loading, setLoading] = useState(true);
+    const { showMessage } = useContext(NotificationsContext)
     useEffect(() => {
         const cleanUp = commentsRef
             .where('task', '==', task)
@@ -23,9 +23,9 @@ export default function CommentContainer({ task }) {
                 })
                 setComments(commentsSnapshot);
                 setLoading(false);
-            }, error => console.error(error))
+            }, error => { console.log(error); showMessage(error.message, 'error') })
         return () => cleanUp();
-    }, [task])
+    }, [task, showMessage])
 
     return (<>
         <CommentForm task={task} />

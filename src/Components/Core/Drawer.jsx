@@ -6,6 +6,7 @@ import BoardCardForm from '../Board/BoardCardForm';
 import BoardCard from '../Board/BoardCard';
 import { UserContext } from '../../providers/UserProvider';
 import { usersRef } from '../../firebase';
+import { NotificationsContext } from '../../providers/NotificationsProvider';
 
 const useStyles = makeStyles((theme) => ({
     list: {
@@ -18,6 +19,7 @@ export default function Drawer({ open, onClose, onOpen }) {
     const [boards, setBoards] = useState(null)
     const [loading, setLoading] = useState(false)
     const { user } = useContext(UserContext)
+    const { showMessage } = useContext(NotificationsContext)
     useEffect(() => {
         const uid = user ? user.uid : '';
         if (uid) {
@@ -28,10 +30,10 @@ export default function Drawer({ open, onClose, onOpen }) {
                     setBoards(data.boards);
                     setLoading(false);
                 }
-            }, error => console.error(error))
+            }, error => { console.log(error); showMessage(error.message, 'error') })
             return () => cleanUp();
         }
-    }, [user])
+    }, [user, showMessage])
 
     return (
         <SwipeableDrawer open={open} onClose={onClose} onOpen={onOpen}>

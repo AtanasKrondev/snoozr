@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import MomentUtils from '@date-io/moment';
 import {
     DateTimePicker,
@@ -10,9 +10,11 @@ import { timeStamp, tasksRef } from '../../firebase';
 import { Formik } from 'formik';
 import SaveIcon from '@material-ui/icons/Save';
 import DeleteIcon from '@material-ui/icons/Delete';
+import { NotificationsContext } from '../../providers/NotificationsProvider';
 
 export default function TaskDatePicker({ id, initDate, close }) {
     const dueDate = initDate ? initDate.toDate() : new Date()
+    const { showMessage } = useContext(NotificationsContext)
 
     return (
         <Formik
@@ -20,13 +22,14 @@ export default function TaskDatePicker({ id, initDate, close }) {
             onSubmit={({ dueDate }) => dueDate ? tasksRef.doc(id)
                 .set({ dueDate: timeStamp.fromDate(dueDate) }, { merge: true })
                 .then(() => close())
-                .catch(error => console.error(error)) :
+                .catch(error => { console.log(error); showMessage(error.message, 'error') }) :
                 tasksRef.doc(id)
                     .set({ dueDate: null }, { merge: true })
                     .then(() => close())
-                    .catch(error => console.error(error))
+                    .catch(error => { console.log(error); showMessage(error.message, 'error') })
+
             }>
-            {({ values, setFieldValue, handleSubmit }) => (
+            {({ values, setFieldValue, handleSubmit, isValid, dirty }) => (
                 <MuiPickersUtilsProvider utils={MomentUtils}>
                     <DateTimePicker
                         autoOk
@@ -45,7 +48,7 @@ export default function TaskDatePicker({ id, initDate, close }) {
                             ),
                         }}
                     />
-                    <IconButton size="small" onClick={handleSubmit}><SaveIcon /></IconButton>
+                    <IconButton size="small" onClick={handleSubmit} disabled={!isValid || !dirty}><SaveIcon /></IconButton>
                     <IconButton size="small" onClick={() => setFieldValue('dueDate', null)}><DeleteIcon /></IconButton>
                 </MuiPickersUtilsProvider >)}
         </Formik >

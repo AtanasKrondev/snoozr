@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { FormControl, Typography, IconButton, FormGroup, FormControlLabel, Checkbox, TextField, makeStyles } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import EditIcon from '@material-ui/icons/Edit';
@@ -11,16 +11,18 @@ import ReplayIcon from '@material-ui/icons/Replay';
 import { Formik, FieldArray } from 'formik';
 import { tasksRef, fieldValue } from '../../firebase';
 import { item, checklist as checklistSchema } from '../../vaildators';
+import { NotificationsContext } from '../../providers/NotificationsProvider';
 
 const useStyles = makeStyles({ checklistAdd: { display: 'flex' }, row: { display: 'flex' } })
 
 export default function TaskChecklist({ checklist, id }) {
     const classes = useStyles();
+    const { showMessage } = useContext(NotificationsContext)
     const [editChecklist, setEditChecklist] = useState(false);
     const handleEditChecklist = () => setEditChecklist(!editChecklist);
     const submitHandler = ({ checklist }) => tasksRef.doc(id)
         .set({ checklist }, { merge: true })
-        .catch(error => console.log(error))
+        .catch(error => { console.log(error); showMessage(error.message, 'error') })
 
     return (<>
         <FormControl>
@@ -89,10 +91,10 @@ export default function TaskChecklist({ checklist, id }) {
             onSubmit={({ item }) => {
                 tasksRef.doc(id)
                     .set({ checklist: fieldValue.arrayUnion({ item, checked: false }) }, { merge: true })
-                    .catch(error => console.log(error))
+                    .catch(error => { console.log(error); showMessage(error.message, 'error') })
             }}
             validationSchema={item}>
-            {({ touched, errors, getFieldProps, handleSubmit, resetForm }) => (
+            {({ touched, errors, getFieldProps, handleSubmit, resetForm, isValid, dirty }) => (
                 <form className={classes.checklistAdd} onSubmit={handleSubmit}>
                     <TextField
                         id="item"
@@ -101,7 +103,7 @@ export default function TaskChecklist({ checklist, id }) {
                         helperText={errors.item}
                         {...getFieldProps('item')}
                     />
-                    <IconButton size="small" type="submit">
+                    <IconButton size="small" type="submit" disabled={!isValid || !dirty}>
                         <AddIcon />
                     </IconButton>
                     <IconButton size="small" onClick={resetForm}>

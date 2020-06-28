@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { Formik } from 'formik';
 import { useHistory } from 'react-router-dom'
@@ -12,6 +12,7 @@ import Container from '@material-ui/core/Container';
 
 import { auth, usersRef } from '../../firebase'
 import { userSignup } from '../../vaildators';
+import { NotificationsContext } from '../../providers/NotificationsProvider';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -52,6 +53,7 @@ const useStyles = makeStyles((theme) => ({
 export default function SignUp() {
   const classes = useStyles();
   const history = useHistory();
+  const { showMessage } = useContext(NotificationsContext)
 
   return (
     <Container maxWidth="xs" className={classes.root}>
@@ -65,16 +67,19 @@ export default function SignUp() {
         initialValues={{ displayName: '', photoURL: '', email: '', password: '', rePassword: '' }}
         onSubmit={({ displayName, photoURL, email, password }) => {
           auth.createUserWithEmailAndPassword(email, password)
-            .then(({ user }) => {
-              usersRef.doc(user.uid).set({ displayName, photoURL })
-                .catch(error => console.error(error))
+            .then((response) => {
+              usersRef.doc(response.user.uid).set({})
+                .catch(error => { console.log(error); showMessage(error.message, 'error') })
             })
             .then(() => auth.currentUser.updateProfile({ displayName, photoURL }))
+            .then(() => usersRef.doc(auth.currentUser.uid).set({ displayName, photoURL })
+              .then(() => showMessage(`Welcome, ${displayName}!`, 'success'))
+              .catch(error => { console.log(error); showMessage(error.message, 'error') }))
             .then(() => history.push('/profile'))
-            .catch(error => console.error(error))
+            .catch(error => { console.log(error); showMessage(error.message, 'error') })
         }}
         validationSchema={userSignup}
-      >{({ touched, errors, getFieldProps, handleSubmit }) => (
+      >{({ touched, errors, getFieldProps, handleSubmit, isValid, dirty }) => (
         <form className={classes.form} onSubmit={handleSubmit}>
           <TextField
             autoComplete="name"
@@ -142,6 +147,7 @@ export default function SignUp() {
             type="submit"
             fullWidth
             variant="contained"
+            disabled={!dirty || !isValid}
             color="primary"
             className={classes.submit}
           >

@@ -8,6 +8,7 @@ import { Formik } from 'formik';
 import { boardsRef, listsRef, fieldValue } from '../../firebase';
 import { UserContext } from '../../providers/UserProvider';
 import { title } from '../../vaildators';
+import { NotificationsContext } from '../../providers/NotificationsProvider';
 
 const useStyles = makeStyles((theme) => ({
     list: {
@@ -26,6 +27,7 @@ export default function TaskListForm({ boardId }) {
     const classes = useStyles();
     const board = boardsRef.doc(boardId);
     const { user } = useContext(UserContext);
+    const { showMessage } = useContext(NotificationsContext);
 
     return (
         <Paper className={classes.list} >
@@ -35,17 +37,17 @@ export default function TaskListForm({ boardId }) {
                     const author = user ? user.uid : '';
                     listsRef.add({ title, tasks: [], author })
                         .then(({ id }) => board.set({ lists: fieldValue.arrayUnion(id) }, { merge: true }))
-                        .catch(error => console.error(error))
+                        .catch(error => { console.log(error); showMessage(error.message, 'error') })
                 }}
                 validationSchema={title}>
-                {({ touched, errors, getFieldProps, handleSubmit }) => (
+                {({ touched, errors, getFieldProps, handleSubmit, isValid, dirty }) => (
                     <FormControl fullWidth error={touched.title && !!errors.title} >
                         <InputLabel htmlFor="title" variant="filled">Add List</InputLabel>
                         <OutlinedInput id="title" type="text" className={classes.input}
                             {...getFieldProps('title')}
                             endAdornment={
                                 <InputAdornment position="end">
-                                    <IconButton onClick={handleSubmit}><AddIcon /></IconButton>
+                                    <IconButton onClick={handleSubmit} disabled={!isValid || !dirty}><AddIcon /></IconButton>
                                 </InputAdornment>
                             }
                         />

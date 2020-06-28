@@ -10,6 +10,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { auth } from '../../firebase';
 import { userCredentials } from '../../vaildators';
+import { useContext } from 'react';
+import { NotificationsContext } from '../../providers/NotificationsProvider';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -51,6 +53,7 @@ const useStyles = makeStyles((theme) => ({
 export default function SignIn() {
   const classes = useStyles();
   const history = useHistory();
+  const { showMessage } = useContext(NotificationsContext)
 
   return (
     <Container maxWidth="xs" className={classes.root}>
@@ -64,11 +67,15 @@ export default function SignIn() {
         initialValues={{ email: '', password: '' }}
         onSubmit={({ email, password }) => {
           auth.signInWithEmailAndPassword(email, password)
+            .then(({ user }) => showMessage(`Welcome back, ${user.displayName}`, 'success'))
             .then(() => history.push('/'))
-            .catch(error => console.error(error))
+            .catch(error => {
+              console.log(error);
+              showMessage(error.message, 'error')
+            })
         }}
         validationSchema={userCredentials}
-      >{({ touched, errors, getFieldProps, handleSubmit }) => (
+      >{({ touched, errors, getFieldProps, handleSubmit, isValid, dirty }) => (
         <form className={classes.form} onSubmit={handleSubmit}>
           <TextField
             variant="outlined"
@@ -101,6 +108,7 @@ export default function SignIn() {
             variant="contained"
             color="primary"
             className={classes.submit}
+            disabled={!dirty || !isValid}
           >
             Sign In
           </Button>

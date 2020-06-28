@@ -13,6 +13,7 @@ import UndoIcon from '@material-ui/icons/Undo';
 import { ButtonGroup, ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { userProfile, userCredentials, changePassword } from '../../vaildators';
+import { NotificationsContext } from '../../providers/NotificationsProvider';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -58,11 +59,12 @@ const useStyles = makeStyles((theme) => ({
 export default function SignIn() {
     const classes = useStyles();
     const { user } = useContext(UserContext)
+    const { showMessage } = useContext(NotificationsContext)
 
     return (
         <Container maxWidth="xs" className={classes.root}>
             {user.photoURL ? <Avatar className={classes.avatar} alt={user.displayName} src={user.photoURL} /> :
-                <Avatar>{user.displayName[0]}</Avatar>}
+                <Avatar>{user.displayName && user.displayName[0]}</Avatar>}
             <Typography component="h1" variant="h5">{user.displayName}</Typography>
             <ExpansionPanel className={classes.expansion}>
                 <ExpansionPanelSummary
@@ -75,11 +77,15 @@ export default function SignIn() {
                         initialValues={{ displayName: user.displayName || '', photoURL: user.photoURL || '' }}
                         onSubmit={({ displayName, photoURL }) => {
                             auth.currentUser.updateProfile({ displayName, photoURL })
-                                .then(() => usersRef.doc(user.uid).set({ displayName, photoURL }, { merge: true }))
-                                .catch(error => console.error(error))
+                                .then(() => {
+                                    usersRef.doc(user.uid).set({ displayName, photoURL }, { merge: true })
+                                        .then(() => showMessage('Update successful!', 'info'))
+                                        .catch(error => { console.log(error); showMessage(error.message, 'error') })
+                                })
+                                .catch(error => { console.log(error); showMessage(error.message, 'error') })
                         }}
                         validationSchema={userProfile}
-                    >{({ touched, errors, getFieldProps, handleSubmit, handleReset }) => (
+                    >{({ touched, errors, getFieldProps, handleSubmit, handleReset, dirty, isValid }) => (
                         <form className={classes.form} onSubmit={handleSubmit}>
                             <TextField
                                 autoComplete="name"
@@ -107,7 +113,7 @@ export default function SignIn() {
                             />
                             <ButtonGroup fullWidth variant="contained" color="primary">
                                 <Button startIcon={<UndoIcon />} onClick={handleReset}>Reset</Button>
-                                <Button type="submit" startIcon={<SaveIcon />}>Update</Button>
+                                <Button type="submit" disabled={!dirty || !isValid} startIcon={<SaveIcon />}>Update</Button>
                             </ButtonGroup>
                         </form>
                     )}
@@ -125,12 +131,16 @@ export default function SignIn() {
                         initialValues={{ email: user.email, password: '' }}
                         onSubmit={({ email, password }, { resetForm }) => {
                             auth.signInWithEmailAndPassword(user.email, password)
-                                .then(() => auth.currentUser.updateEmail(email))
-                                .catch(error => console.error(error));
+                                .then(() => {
+                                    auth.currentUser.updateEmail(email)
+                                        .then(() => showMessage('Update successful!', 'info'))
+                                        .catch(error => { console.log(error); showMessage(error.message, 'error') })
+                                })
+                                .catch(error => { console.log(error); showMessage(error.message, 'error') })
                             resetForm();
                         }}
                         validationSchema={userCredentials}
-                    >{({ touched, errors, getFieldProps, handleSubmit, handleReset }) => (
+                    >{({ touched, errors, getFieldProps, handleSubmit, handleReset, isValid, dirty }) => (
                         <form className={classes.form} onSubmit={handleSubmit}>
                             <TextField
                                 variant="outlined"
@@ -159,7 +169,7 @@ export default function SignIn() {
                             />
                             <ButtonGroup fullWidth variant="contained" color="primary">
                                 <Button startIcon={<UndoIcon />} onClick={handleReset}>Reset</Button>
-                                <Button type="submit" startIcon={<SaveIcon />}>Update</Button>
+                                <Button type="submit" disabled={!dirty || !isValid} startIcon={<SaveIcon />}>Update</Button>
                             </ButtonGroup>
                         </form>
                     )}
@@ -177,12 +187,14 @@ export default function SignIn() {
                         initialValues={{ passwordC: '', newPassword: '', rePassword: '' }}
                         onSubmit={({ passwordC, newPassword }, { resetForm }) => {
                             auth.signInWithEmailAndPassword(user.email, passwordC)
-                                .then(() => auth.currentUser.updatePassword(newPassword))
-                                .catch(error => console.error(error))
+                                .then(() => auth.currentUser.updatePassword(newPassword)
+                                    .then(() => showMessage('Update successful!', 'info'))
+                                    .catch(error => { console.log(error); showMessage(error.message, 'error') }))
+                                .catch(error => { console.log(error); showMessage(error.message, 'error') })
                             resetForm();
                         }}
                         validationSchema={changePassword}
-                    >{({ touched, errors, getFieldProps, handleSubmit, handleReset }) => (
+                    >{({ touched, errors, getFieldProps, handleSubmit, handleReset, isValid, dirty }) => (
                         <form className={classes.form} onSubmit={handleSubmit}>
                             <TextField
                                 variant="outlined"
@@ -223,7 +235,7 @@ export default function SignIn() {
                             />
                             <ButtonGroup fullWidth variant="contained" color="primary">
                                 <Button startIcon={<UndoIcon />} onClick={handleReset}>Reset</Button>
-                                <Button type="submit" startIcon={<SaveIcon />}>Update</Button>
+                                <Button type="submit" disabled={!isValid || !dirty} startIcon={<SaveIcon />}>Update</Button>
                             </ButtonGroup>
                         </form>
                     )}

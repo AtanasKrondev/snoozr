@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
@@ -15,6 +15,7 @@ import TaskDetails from './TaskDetails'
 import { tasksRef } from '../../firebase';
 import { CircularProgress } from '@material-ui/core';
 import moment from 'moment'
+import { NotificationsContext } from '../../providers/NotificationsProvider';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -39,6 +40,7 @@ export default function TaskCard({ id, children }) {
     const [isOpen, setIsOpen] = useState(false);
     const handleOpen = () => setIsOpen(true);
     const handleClose = () => setIsOpen(false);
+    const { showMessage } = useContext(NotificationsContext)
 
     const [task, setTask] = useState(null);
     const [loading, setLoading] = useState(true)
@@ -47,7 +49,7 @@ export default function TaskCard({ id, children }) {
         const data = snapshot.data();
         setTask({ id, ...data });
         setLoading(false);
-    }, error => console.error(error)), [id])
+    }, error => { console.log(error); showMessage(error.message, 'error') }), [id, showMessage])
 
     return (
         <>
