@@ -14,19 +14,6 @@ const useStyles = makeStyles((theme) => ({
         paddingTop: theme.spacing(1),
         display: 'flex',
         flexDirection: 'row',
-        overflowY: 'scroll',
-        height: '90vh',
-        '&::-webkit-scrollbar': {
-            width: '0.4em'
-        },
-        '&::-webkit-scrollbar-track': {
-            boxShadow: 'inset 0 0 6px rgba(0,0,0,0.00)',
-            webkitBoxShadow: 'inset 0 0 6px rgba(0,0,0,0.00)',
-        },
-        '&::-webkit-scrollbar-thumb': {
-            backgroundColor: theme.palette.primary.dark,
-            borderRadius: '0.8em'
-        }
     }
 }));
 
@@ -48,7 +35,7 @@ export default function Home() {
             }
         }, error => { console.log(error); showMessage('Something went wrong!', 'warning') })
         return () => cleanUp();
-    }, [user,showMessage])
+    }, [user, showMessage])
 
     return (<>{
         loading ? <LinearProgress color="secondary" /> :

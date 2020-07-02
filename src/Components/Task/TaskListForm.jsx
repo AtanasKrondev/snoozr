@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Paper, FormHelperText } from '@material-ui/core';
+import { FormHelperText } from '@material-ui/core';
 import { IconButton, FormControl, InputLabel, InputAdornment } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import OutlinedInput from '@material-ui/core/OutlinedInput';
@@ -13,6 +13,7 @@ import { NotificationsContext } from '../../providers/NotificationsProvider';
 const useStyles = makeStyles((theme) => ({
     list: {
         margin: theme.spacing(1),
+        paddingRight: theme.spacing(1),
         flexShrink: 0,
         flexGrow: 1,
         width: 300,
@@ -30,7 +31,7 @@ export default function TaskListForm({ boardId }) {
     const { showMessage } = useContext(NotificationsContext);
 
     return (
-        <Paper className={classes.list} >
+        <div className={classes.list} >
             <Formik
                 initialValues={{ title: '' }}
                 onSubmit={({ title }) => {
@@ -55,6 +56,6 @@ export default function TaskListForm({ boardId }) {
                     </FormControl>
                 )}
             </Formik>
-        </Paper >
+        </div >
     );
 }

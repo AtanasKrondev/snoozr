@@ -2,9 +2,8 @@ import React, { useEffect, useState, useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import TaskList from '../Task/TaskList';
 import TaskListForm from '../Task/TaskListForm';
-import Container from '@material-ui/core/Container';
 import { useParams, useHistory } from 'react-router-dom';
-import { boardsRef, usersRef, fieldValue } from '../../firebase';
+import { boardsRef, usersRef, fieldValue, tasksRef, listsRef } from '../../firebase';
 import { Typography, LinearProgress, IconButton, TextField, Box, Menu, MenuItem, ListItemIcon, ListItemText, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import CloseIcon from '@material-ui/icons/Close';
@@ -17,16 +16,21 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 import { NotificationsContext } from '../../providers/NotificationsProvider';
+import { DragDropContext } from 'react-beautiful-dnd';
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        paddingTop: theme.spacing(1),
         display: 'flex',
         flexDirection: 'row',
         overflowX: 'scroll',
         height: '85vh',
         '&::-webkit-scrollbar': {
-            width: '0.4em'
+            width: 5,
+            height: 5,
+        },
+        '&::-webkit-scrollbar-corner': {
+            backgroundColor: theme.palette.background.paper,
+
         },
         '&::-webkit-scrollbar-track': {
             boxShadow: 'inset 0 0 6px rgba(0,0,0,0.00)',
@@ -34,11 +38,10 @@ const useStyles = makeStyles((theme) => ({
         },
         '&::-webkit-scrollbar-thumb': {
             backgroundColor: theme.palette.primary.dark,
-            borderRadius: '0.8em'
         }
     },
     title: {
-        paddingLeft: theme.spacing(3)
+        paddingLeft: theme.spacing(3),
     }
 }));
 
@@ -73,6 +76,24 @@ export default function Board() {
     const handleMenuOpen = (event) => { setAnchorEl(event.currentTarget) }
     const handleMenuClose = () => setAnchorEl(null);
 
+    const reorder = (list, startIndex, endIndex) => {
+        const result = Array.from(list);
+        const [removed] = result.splice(startIndex, 1);
+        result.splice(endIndex, 0, removed);
+
+        return result;
+    };
+
+    const move = (source, destination, droppableSource, droppableDestination) => {
+        const fromList = Array.from(source);
+        const toList = Array.from(destination);
+        const [removed] = fromList.splice(droppableSource.index, 1);
+
+        toList.splice(droppableDestination.index, 0, removed);
+
+        return { fromList, toList };
+    };
+
     useEffect(() => boardsRef.doc(id).onSnapshot(snapshot => {
         setLoading(true)
         if (snapshot.exists) {
@@ -81,6 +102,34 @@ export default function Board() {
             setLoading(false);
         } else history.push('/404')
     }, error => { console.log(error); showMessage(error.message, 'error') }), [id, history, showMessage])
+
+    const onDragEnd = ({ destination, source, draggableId }) => {
+        if (!destination) { return; }
+        if (destination.droppableId === source.droppableId && destination.index === source.index) {
+            return;
+        }
+        if (destination.droppableId === source.droppableId) {
+            listsRef.doc(destination.droppableId).get().then(res => {
+                const { tasks } = res.data();
+                const newOrder = reorder(tasks, source.index, destination.index)
+                listsRef.doc(destination.droppableId).set({ tasks: newOrder }, { merge: true })
+                    .catch(error => { console.log(error); showMessage(error.message, 'error') })
+            })
+        } else {
+            const fromList = listsRef.doc(source.droppableId).get()
+            const toList = listsRef.doc(destination.droppableId).get()
+            Promise.all([fromList, toList]).then(([from, to]) => {
+                const tasksFrom = from.data().tasks;
+                const tasksTo = to.data().tasks;
+                const newOrder = move(tasksFrom, tasksTo, source, destination)
+                const updatedSource = listsRef.doc(source.droppableId).set({ tasks: newOrder.fromList }, { merge: true });
+                const updatedDestination = listsRef.doc(destination.droppableId).set({ tasks: newOrder.toList }, { merge: true });
+                const updatedTask = tasksRef.doc(draggableId).set({ list: destination.droppableId }, { merge: true });
+                Promise.all([updatedSource, updatedDestination, updatedTask])
+                    .catch(error => { console.log(error); showMessage(error.message, 'error') })
+            })
+        }
+    }
 
     return (<>{loading ? <LinearProgress color="secondary" /> : <>
         <Box className={classes.title}>
@@ -125,37 +174,39 @@ export default function Board() {
                     </Menu>
                 </Typography>}
         </Box>
-        <Container className={classes.root}>
-            <Formik initialValues={{ lists: board.lists || [] }}
-                onSubmit={({ lists }) => boardsRef.doc(id)
-                    .set({ lists }, { merge: true }).catch(error => console.log(error))}>
-                {({ values, handleSubmit }) => <FieldArray name="lists"
-                    render={arrayHelpers => (<>
-                        {values.lists && values.lists
-                            .map((listId, index) => (
-                                <TaskList
-                                    key={listId} id={listId} boardId={id}
-                                    prevId={values.lists[index - 1]} nextId={values.lists[index + 1]}>
-                                    <MenuItem
-                                        disabled={index === 0}
-                                        onClick={() => { if (index !== 0) { arrayHelpers.swap(index, index - 1); handleSubmit() } }}
-                                    >
-                                        <ListItemIcon><KeyboardArrowLeftIcon /></ListItemIcon>
-                                        <ListItemText primary="Move Left" />
-                                    </MenuItem>
-                                    <MenuItem
-                                        disabled={values.lists && index === values.lists.length - 1}
-                                        onClick={() => { if (index !== values.lists.length - 1) { arrayHelpers.swap(index, index + 1); handleSubmit() } }}
-                                    >
-                                        <ListItemIcon><KeyboardArrowRightIcon /></ListItemIcon>
-                                        <ListItemText primary="Move Right" />
-                                    </MenuItem>
-                                </TaskList>))}
-                    </>)}
-                />}
-            </Formik>
-            < TaskListForm boardId={id} />
-        </ Container></>}
+        <DragDropContext onDragEnd={onDragEnd}>
+            <div className={classes.root}>
+                <Formik initialValues={{ lists: board.lists || [] }}
+                    onSubmit={({ lists }) => boardsRef.doc(id)
+                        .set({ lists }, { merge: true }).catch(error => console.log(error))}>
+                    {({ values, handleSubmit }) => <FieldArray name="lists"
+                        render={arrayHelpers => (<>
+                            {values.lists && values.lists
+                                .map((listId, index) => (
+                                    <TaskList
+                                        key={listId} id={listId} boardId={id}
+                                        prevId={values.lists[index - 1]} nextId={values.lists[index + 1]}>
+                                        <MenuItem
+                                            disabled={index === 0}
+                                            onClick={() => { if (index !== 0) { arrayHelpers.swap(index, index - 1); handleSubmit() } }}
+                                        >
+                                            <ListItemIcon><KeyboardArrowLeftIcon /></ListItemIcon>
+                                            <ListItemText primary="Move Left" />
+                                        </MenuItem>
+                                        <MenuItem
+                                            disabled={values.lists && index === values.lists.length - 1}
+                                            onClick={() => { if (index !== values.lists.length - 1) { arrayHelpers.swap(index, index + 1); handleSubmit() } }}
+                                        >
+                                            <ListItemIcon><KeyboardArrowRightIcon /></ListItemIcon>
+                                            <ListItemText primary="Move Right" />
+                                        </MenuItem>
+                                    </TaskList>))}
+                        </>)}
+                    />}
+                </Formik>
+                < TaskListForm boardId={id} />
+            </ div>
+        </DragDropContext></>}
         <Dialog open={deleteDialog} onClose={handleDeleteDialog}>
             <DialogTitle>Delete this board?</DialogTitle>
             <DialogContent>

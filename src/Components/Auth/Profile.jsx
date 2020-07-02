@@ -21,19 +21,6 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        overflowY: 'scroll',
-        height: '86vh',
-        '&::-webkit-scrollbar': {
-            width: '0.4em'
-        },
-        '&::-webkit-scrollbar-track': {
-            boxShadow: 'inset 0 0 6px rgba(0,0,0,0.00)',
-            webkitBoxShadow: 'inset 0 0 6px rgba(0,0,0,0.00)',
-        },
-        '&::-webkit-scrollbar-thumb': {
-            backgroundColor: theme.palette.primary.dark,
-            borderRadius: '0.8em'
-        }
     },
     avatar: {
         margin: theme.spacing(1),

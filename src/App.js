@@ -16,7 +16,17 @@ import NotificationsProvider from './providers/NotificationsProvider';
 const useStyles = makeStyles({
   '@global': {
     body: {
-      backgroundColor: theme.palette.background.paper
+      backgroundColor: theme.palette.background.paper,
+      '&::-webkit-scrollbar': {
+        width: 5,
+      },
+      '&::-webkit-scrollbar-track': {
+        boxShadow: 'inset 0 0 6px rgba(0,0,0,0.00)',
+        webkitBoxShadow: 'inset 0 0 6px rgba(0,0,0,0.00)',
+      },
+      '&::-webkit-scrollbar-thumb': {
+        backgroundColor: theme.palette.primary.dark,
+      }
     }
   },
 });
