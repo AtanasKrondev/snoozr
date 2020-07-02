@@ -1,7 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { Grid, LinearProgress } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
 import BoardCard from './Board/BoardCard'
 import BoardCardForm from './Board/BoardCardForm'
 import { UserContext } from '../providers/UserProvider';
@@ -39,7 +38,7 @@ export default function Home() {
 
     return (<>{
         loading ? <LinearProgress color="secondary" /> :
-            < Container className={classes.root} >
+            <div className={classes.root} >
                 <Grid container>
                     {boards && boards.map((id) => (
                         <Grid item key={id} xs={12} sm={6} md={4} lg={3}>
@@ -49,6 +48,6 @@ export default function Home() {
                         <BoardCardForm card />
                     </Grid>
                 </Grid>
-            </Container >
+            </div>
     }</>)
 }

@@ -44,7 +44,7 @@ function App() {
         <CssBaseline />
         <ThemeProvider theme={theme}>
           <NotificationsProvider>
-            <Paper>
+            <Paper elevation={0}>
               <Header onClick={toggleDrawer} />
               <Drawer open={isOpen} onClose={toggleDrawer} onOpen={toggleDrawer} />
               <AppRouter />
