@@ -2,6 +2,33 @@
 
 See it live at: https://snooz-r.web.app/
 
+This is a simple app for Kanban like managing of tasks in boards.
+
+### Features
+
+Non-authenticated users are redirected to the sign-in page.
+Once authenticated a user can:
+- Change preferences: display name, profile photo, login email, password (latest two need reauthentication)
+- Create, edit and delete boards. A board can be deleted only if it is empty.
+- Every board consist of Lists with tasks. Lists can be created, edited, rearanged within the board and deleted (only if they are empty).
+- A list consists of tasks. Task can be rearranged within the board through drag and drop.
+- Tasks can be created, deleted and edited. Only the title of the task is mandatory. Also it can includes due date, image, description, checklist and comments.
+- Currently a user can only work with their own boards. (Probably will updated in future).
+
+### Used technologies
+
+- Front-end built with React
+- Firebase for authentication and data storage
+
+Additional front-end libraries:
+- React Router DOM
+- React Material UI for styling
+- React Material UI Picker for date picking
+- Moment for date formatting
+- React Beautiful DND for drag and drop functionality
+- Formik for forms managing
+- Yup for data validation
+
 ## -
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
